@@ -1,3 +1,5 @@
+import { withAssetBase } from './assetPath.js';
+
 export const profile = {
   name: '谢名剑',
   role: 'Design Engineer',
@@ -24,7 +26,7 @@ export const navItems = [
   { label: '联系', path: '/contact' }
 ];
 
-export const portfolioSections = {
+const rawPortfolioSections = {
   app: {
     title: '移动产品与体验',
     kicker: 'APP',
@@ -1377,7 +1379,7 @@ export const portfolioSections = {
   }
 };
 
-export const photographyItems = [
+const rawPhotographyItems = [
   {
     id: 'photo-001',
     src: '/assets/photography/optimized/huaban-77551582-001-5004284533.jpg',
@@ -2198,6 +2200,9 @@ export const photographyItems = [
     aspectRatio: '1536 / 2305'
   }
 ];
+
+export const portfolioSections = withAssetBase(rawPortfolioSections);
+export const photographyItems = withAssetBase(rawPhotographyItems);
 
 export function findProjectById(projectId) {
   return Object.values(portfolioSections)

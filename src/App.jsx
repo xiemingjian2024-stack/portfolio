@@ -10,20 +10,21 @@ import {
   portfolioSections,
   profile
 } from './portfolioData.js';
+import { assetPath } from './assetPath.js';
 import './styles.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const APP_ICON_GUIDE_ICONS = Array.from({ length: 42 }, (_, index) => (
-  `/assets/app-icon-guide/icons/icon-${String(index + 1).padStart(2, '0')}.svg`
+  assetPath(`/assets/app-icon-guide/icons/icon-${String(index + 1).padStart(2, '0')}.svg`)
 ));
 
 const APP_ICON_GUIDE_SET_A = APP_ICON_GUIDE_ICONS.slice(0, 20);
 const APP_ICON_GUIDE_SET_B = APP_ICON_GUIDE_ICONS.slice(20, 40);
 const APP_ICON_GUIDE_ORIGINALS = Array.from({ length: 7 }, (_, index) => (
-  `/assets/app-icon-guide/originals/guide-${String(index + 1).padStart(2, '0')}.jpg`
+  assetPath(`/assets/app-icon-guide/originals/guide-${String(index + 1).padStart(2, '0')}.jpg`)
 ));
-const BRAND_EVOLUTION_BASE = '/assets/app-icon-guide/brand-evolution-ascii';
+const BRAND_EVOLUTION_BASE = assetPath('/assets/app-icon-guide/brand-evolution-ascii');
 const BRAND_EVOLUTION_ICONS = Array.from({ length: 8 }, (_, index) => {
   const number = String(index + 1).padStart(2, '0');
   return {
@@ -33,29 +34,29 @@ const BRAND_EVOLUTION_ICONS = Array.from({ length: 8 }, (_, index) => {
 });
 const APP_ICON_LINE_CARDS = [
   {
-    src: '/assets/app-icon-guide/line-system/shipping.svg',
+    src: assetPath('/assets/app-icon-guide/line-system/shipping.svg'),
     alt: 'Shipping 图标线条与端点规范',
   },
   {
-    src: '/assets/app-icon-guide/line-system/sort.svg',
+    src: assetPath('/assets/app-icon-guide/line-system/sort.svg'),
     alt: 'Sort 图标线条与端点规范',
   },
   {
-    src: '/assets/app-icon-guide/line-system/filter.svg',
+    src: assetPath('/assets/app-icon-guide/line-system/filter.svg'),
     alt: 'Filter 图标线条与端点规范',
   },
 ];
 const APP_ICON_MODIFIER_CARDS = [
   {
-    src: '/assets/app-icon-guide/modifiers/classification.svg',
+    src: assetPath('/assets/app-icon-guide/modifiers/classification.svg'),
     alt: 'Classification 组合图标修饰符规范',
   },
   {
-    src: '/assets/app-icon-guide/modifiers/processing.svg',
+    src: assetPath('/assets/app-icon-guide/modifiers/processing.svg'),
     alt: 'Processing 组合图标修饰符规范',
   },
   {
-    src: '/assets/app-icon-guide/modifiers/contact.svg',
+    src: assetPath('/assets/app-icon-guide/modifiers/contact.svg'),
     alt: 'Contact 组合图标修饰符规范',
   },
 ];
@@ -68,7 +69,7 @@ const CASE_MOTION = {
 };
 
 const UOM_FEEDBACK_AVATARS = Array.from({ length: 11 }, (_, index) => (
-  `/assets/uom/avatars/avatar-${String(index + 1).padStart(2, '0')}.svg`
+  assetPath(`/assets/uom/avatars/avatar-${String(index + 1).padStart(2, '0')}.svg`)
 ));
 function App() {
   return (
@@ -225,7 +226,7 @@ function BujiabanCover() {
     <div className="bujiaban-cover" aria-hidden="true">
       <span className="bujiaban-cover__flow bujiaban-cover__flow--one" />
       <span className="bujiaban-cover__flow bujiaban-cover__flow--two" />
-      <img className="bujiaban-cover__logo" src="/assets/bujiaban-smart-material-tool/logo.svg" alt="" />
+      <img className="bujiaban-cover__logo" src={assetPath('/assets/bujiaban-smart-material-tool/logo.svg')} alt="" />
     </div>
   );
 }
@@ -379,7 +380,7 @@ function CaseStudyDetail({ project }) {
       <CaseNarrativeCard section={maintenanceSection} />
       <section className="case-visual-section case-visual-section--live" aria-label={`${project.title} 上线截图`}>
         <figure className="case-live-shot case-live-shot--mockup">
-          <img src="/assets/product-assets-final-result.jpg" alt="插件上线后的产品页效果" />
+          <img src={assetPath('/assets/product-assets-final-result.jpg')} alt="插件上线后的产品页效果" />
         </figure>
       </section>
       <CodexWorkflowSection />
@@ -631,7 +632,7 @@ function UomCover({ project, detail = false }) {
       aria-label={project.coverImageAlt}
       role="img"
     >
-      <img className="uom-cover__logo" src="/assets/uom/uom-vmall-portal.svg" alt="" aria-hidden="true" />
+      <img className="uom-cover__logo" src={assetPath('/assets/uom/uom-vmall-portal.svg')} alt="" aria-hidden="true" />
     </div>
   );
 }
@@ -639,7 +640,7 @@ function UomCover({ project, detail = false }) {
 function AmazonStoreCover({ detail = false }) {
   return (
     <div className={`amazon-store-cover ${detail ? 'amazon-store-cover--detail' : ''}`} aria-hidden="true">
-      <img src="/assets/amazon-store-home/cover.jpg" alt="" />
+      <img src={assetPath('/assets/amazon-store-home/cover.jpg')} alt="" />
     </div>
   );
 }
@@ -648,42 +649,42 @@ const AMAZON_RESEARCH = [
   {
     title: 'Chuckit!',
     tag: 'Pet category system',
-    image: '/assets/amazon-store-home/research-amazon-chuckit-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-chuckit-v2.jpg'),
     href: 'https://www.thinknectar.com/case-studies/chuckit-gets-thrown-a-brand-store-makeover',
     body: '用鲜明的品牌色和真实玩耍场景建立品类认知，再按球类、发射器和户外玩法持续分流。'
   },
   {
     title: 'Petcube',
     tag: 'Feature + benefit',
-    image: '/assets/amazon-store-home/research-amazon-petcube-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-petcube-v2.jpg'),
     href: 'https://www.amazon.com/stores/page/8DF9B38B-C875-4B96-BE4B-01FEF2C72775',
     body: '把产品功能、使用结果和宠物陪伴场景放在同一条叙事里，让智能产品更容易理解。'
   },
   {
     title: 'Feetures',
     tag: 'Seasonal merchandising',
-    image: '/assets/amazon-store-home/research-amazon-feetures-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-feetures-v2.jpg'),
     href: 'https://www.amazon.com/stores/node/3028215011',
     body: '以稳定的品牌色组织节日主题、新品和产品网格，让运营变化不破坏页面识别度。'
   },
   {
     title: 'Teton Sports',
     tag: 'Lifestyle to product',
-    image: '/assets/amazon-store-home/research-amazon-teton-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-teton-v2.jpg'),
     href: 'https://www.amazon.com/stores/TETONSports/TETONSports/page/BDCF8577-F2B1-4486-A01A-54B779E52D1C',
     body: '先用真实户外场景建立向往，再让产品在使用环境中成为视觉重点并承接购买。'
   },
   {
     title: 'Thrive Natural Care',
     tag: 'Bold brand expression',
-    image: '/assets/amazon-store-home/research-amazon-thrive-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-thrive-v2.jpg'),
     href: 'https://www.amazon.com/stores/node/14168115011',
     body: '用统一的大地色和生活方式摄影强化品牌个性，同时保持品类入口足够直接。'
   },
   {
     title: 'Yogi Tea',
     tag: 'Mood + category',
-    image: '/assets/amazon-store-home/research-amazon-yogi-v2.jpg',
+    image: assetPath('/assets/amazon-store-home/research-amazon-yogi-v2.jpg'),
     href: 'https://www.amazon.com/stores/node/3050987011',
     body: '把季节氛围、产品体验和直观分类结合起来，让品牌感受自然过渡到商品浏览。'
   }
@@ -804,8 +805,8 @@ function AmazonStoreDetail({ project }) {
           </ul>
         </div>
         <div className="amazon-before__visuals">
-          <AmazonScrollablePage src="/assets/amazon-store-home/before-desktop.jpg" alt="FUNNYFUZZY Amazon 改版前桌面端首页" label="BEFORE / WEB" />
-          <AmazonScrollablePage src="/assets/amazon-store-home/before-mobile.jpg" alt="FUNNYFUZZY Amazon 改版前移动端首页" label="BEFORE / H5" device="mobile" />
+          <AmazonScrollablePage src={assetPath('/assets/amazon-store-home/before-desktop.jpg')} alt="FUNNYFUZZY Amazon 改版前桌面端首页" label="BEFORE / WEB" />
+          <AmazonScrollablePage src={assetPath('/assets/amazon-store-home/before-mobile.jpg')} alt="FUNNYFUZZY Amazon 改版前移动端首页" label="BEFORE / H5" device="mobile" />
         </div>
       </section>
 
@@ -895,7 +896,7 @@ function AmazonStoreDetail({ project }) {
               <h3>紧凑的购物编辑页</h3><p>用更短的页面、明确的分区标题和规则商品网格，优先测试信息密度与转化效率。</p>
             </div>
             <AmazonScrollablePage
-              src="/assets/amazon-store-home/direction-01-desktop-hq.jpg"
+              src={assetPath('/assets/amazon-store-home/direction-01-desktop-hq.jpg')}
               alt="Amazon 首页设计方向一完整页面"
               label="DIRECTION 01 / WEB"
               className="amazon-directions__browser"
@@ -904,7 +905,7 @@ function AmazonStoreDetail({ project }) {
           <article>
             <div className="amazon-directions__copy"><span className="amazon-directions__eyebrow">DIRECTION 02</span><h3>更强的生活方式叙事</h3><p>放大季节场景、品牌形象和产品使用画面，并用更活泼、跳跃的版式节奏强化 FUNNYFUZZY 的品牌辨识度。</p></div>
             <AmazonScrollablePage
-              src="/assets/amazon-store-home/direction-02-desktop-hq.jpg"
+              src={assetPath('/assets/amazon-store-home/direction-02-desktop-hq.jpg')}
               alt="Amazon 首页设计方向二完整页面"
               label="DIRECTION 02 / WEB"
               className="amazon-directions__browser"
@@ -919,7 +920,7 @@ function AmazonStoreDetail({ project }) {
           body="利用桌面端的横向空间建立清晰分区，让主题场景、热销商品、品牌信息与核心类目支持快速比较和连续浏览。"
         />
         <AmazonScrollablePage
-          src="/assets/amazon-store-home/final-desktop-hq.jpg"
+          src={assetPath('/assets/amazon-store-home/final-desktop-hq.jpg')}
           alt="FUNNYFUZZY Amazon 店铺首页最终 Web 端完整方案"
           label="最终 Web 端页面滚动预览"
           className="amazon-final__browser amazon-final-web__browser"
@@ -935,7 +936,7 @@ function AmazonStoreDetail({ project }) {
           {liveUrl && <a className="amazon-final__live" href={liveUrl} target="_blank" rel="noreferrer">查看已上线 Amazon 店铺 <ArrowRight aria-hidden="true" /></a>}
         </div>
         <AmazonScrollablePage
-          src="/assets/amazon-store-home/final-mobile.jpg"
+          src={assetPath('/assets/amazon-store-home/final-mobile.jpg')}
           alt="FUNNYFUZZY Amazon 店铺首页最终移动端完整方案"
           label="最终移动端页面滚动预览"
           device="mobile"
@@ -1000,11 +1001,11 @@ function IdealVmallDetail({ project }) {
     ['黄**', '历史已购商品希望可以随时查看，订单状态和物流信息也要更新得更及时。'],
   ];
   const industryBrands = [
-    ['Apple', '/assets/ideal-vmall/insights/apple.svg'],
-    ['DJI', '/assets/ideal-vmall/insights/dji.svg'],
-    ['CHANEL', '/assets/ideal-vmall/insights/chanel.svg'],
-    ['Louis Vuitton', '/assets/ideal-vmall/insights/louisvuitton.svg'],
-    ['Hermès', '/assets/ideal-vmall/insights/hermes.svg'],
+    ['Apple', assetPath('/assets/ideal-vmall/insights/apple.svg')],
+    ['DJI', assetPath('/assets/ideal-vmall/insights/dji.svg')],
+    ['CHANEL', assetPath('/assets/ideal-vmall/insights/chanel.svg')],
+    ['Louis Vuitton', assetPath('/assets/ideal-vmall/insights/louisvuitton.svg')],
+    ['Hermès', assetPath('/assets/ideal-vmall/insights/hermes.svg')],
   ];
   const insights = [
     ['清晰的浏览与导购体验', '通过新品吸引，引导探索、体验、购买、售后服务构建购买旅程，同时具备线上线下联动能力。'],
@@ -1016,39 +1017,39 @@ function IdealVmallDetail({ project }) {
     {
       brand: '华为商城',
       key: 'vmall',
-      logo: '/assets/ideal-vmall/materials/vmall-logo.png',
-      strip: '/assets/ideal-vmall/materials/vmall-strip-v2.png',
+      logo: assetPath('/assets/ideal-vmall/materials/vmall-logo.png'),
+      strip: assetPath('/assets/ideal-vmall/materials/vmall-strip-v2.png'),
     },
     {
       brand: 'Apple',
       key: 'apple',
-      logo: '/assets/ideal-vmall/materials/apple-logo.png',
-      strip: '/assets/ideal-vmall/materials/apple-strip.png',
+      logo: assetPath('/assets/ideal-vmall/materials/apple-logo.png'),
+      strip: assetPath('/assets/ideal-vmall/materials/apple-strip.png'),
     },
     {
       brand: 'DJI',
       key: 'dji',
-      logo: '/assets/ideal-vmall/materials/dji-logo.png',
-      strip: '/assets/ideal-vmall/materials/dji-strip.png',
+      logo: assetPath('/assets/ideal-vmall/materials/dji-logo.png'),
+      strip: assetPath('/assets/ideal-vmall/materials/dji-strip.png'),
     },
   ];
   const colorStudies = [
     {
       brand: '华为商城',
-      wheel: '/assets/ideal-vmall/colors/vmall-wheel-v2.png',
-      samples: '/assets/ideal-vmall/colors/vmall-samples.png',
+      wheel: assetPath('/assets/ideal-vmall/colors/vmall-wheel-v2.png'),
+      samples: assetPath('/assets/ideal-vmall/colors/vmall-samples.png'),
       points: ['全流程以红色为主', '红色承担过多视觉焦点', '品牌色在促销语境中被稀释'],
     },
     {
       brand: 'Apple',
-      wheel: '/assets/ideal-vmall/colors/apple-wheel-v2.png',
-      samples: '/assets/ideal-vmall/colors/apple-samples.png',
+      wheel: assetPath('/assets/ideal-vmall/colors/apple-wheel-v2.png'),
+      samples: assetPath('/assets/ideal-vmall/colors/apple-samples.png'),
       points: ['全流程仅使用少量彩色', '黑白灰构成界面主体', '色彩只出现在产品与关键状态'],
     },
     {
       brand: 'DJI',
-      wheel: '/assets/ideal-vmall/colors/dji-wheel-v2.png',
-      samples: '/assets/ideal-vmall/colors/dji-samples.png',
+      wheel: assetPath('/assets/ideal-vmall/colors/dji-wheel-v2.png'),
+      samples: assetPath('/assets/ideal-vmall/colors/dji-samples.png'),
       points: ['全流程仅使用少量彩色', '黑白灰构成界面主体', '蓝色与橙色用于操作和状态提示'],
     },
   ];
@@ -1105,8 +1106,8 @@ function IdealVmallDetail({ project }) {
       summary: '以电影计划、文学对谈和人物栏目延伸时装的语境，让品牌不只在发布新品时出现，而是持续参与文化讨论。',
       formats: ['系列影片', '文学对谈', '人物栏目'],
       images: [
-        ['/assets/ideal-vmall/luxury-narrative/chanel-literary.jpg', 'CHANEL 文学对谈栏目'],
-        ['/assets/ideal-vmall/luxury-narrative/chanel-cinema.jpg', 'CHANEL 电影创作者内容'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/chanel-literary.jpg'), 'CHANEL 文学对谈栏目'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/chanel-cinema.jpg'), 'CHANEL 电影创作者内容'],
       ],
       source: 'CHANEL 官方专题',
       sourceUrl: 'https://www.chanel.com/us/fashion/event/literary-rendez-vous/',
@@ -1119,8 +1120,8 @@ function IdealVmallDetail({ project }) {
       summary: '邀请不同领域的创作者重新诠释经典硬箱，再以巡展把作品带入城市空间；产品符号因此变成开放的文化媒介。',
       formats: ['艺术家共创', '主题巡展', '城市事件'],
       images: [
-        ['/assets/ideal-vmall/luxury-narrative/lv-exhibition-02.jpg', 'Louis Vuitton 200 Trunks, 200 Visionaries 展览现场'],
-        ['/assets/ideal-vmall/luxury-narrative/lv-exhibition-01.jpg', 'Louis Vuitton 创作者硬箱作品'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/lv-exhibition-02.jpg'), 'Louis Vuitton 200 Trunks, 200 Visionaries 展览现场'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/lv-exhibition-01.jpg'), 'Louis Vuitton 创作者硬箱作品'],
       ],
       source: 'Louis Vuitton 官方展览',
       sourceUrl: 'https://eu.louisvuitton.com/eng-e1/magazine/articles/louis-200-exhibition',
@@ -1133,8 +1134,8 @@ function IdealVmallDetail({ project }) {
       summary: '由不同艺术家围绕年度主题创作橱窗，将产品、材料与想象编成可步入城市日常的故事，让每次路过都成为一次品牌接触。',
       formats: ['艺术橱窗', '年度主题', '在地创作'],
       images: [
-        ['/assets/ideal-vmall/luxury-narrative/hermes-window-01.jpg', 'Hermès 大阪艺术橱窗'],
-        ['/assets/ideal-vmall/luxury-narrative/hermes-window-02.jpg', 'Hermès 名古屋艺术橱窗'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/hermes-window-01.jpg'), 'Hermès 大阪艺术橱窗'],
+        [assetPath('/assets/ideal-vmall/luxury-narrative/hermes-window-02.jpg'), 'Hermès 名古屋艺术橱窗'],
       ],
       source: 'Hermès 官方橱窗专题',
       sourceUrl: 'https://lanterne.hermes.com/en/local-window/local-window-26summer/',
@@ -1352,9 +1353,9 @@ function IdealVmallDetail({ project }) {
         </div>
         <div className="ideal-vmall-direction__grid">
           {[
-            ['纯净', '坚持少即是多', ['页面定位清晰', '净化页面空间', '以用户视角呈现信息', '减少重复页面与内容', '保留呼吸感留白'], '/assets/ideal-vmall/strategy/purity.jpg', '户外移动场景中的纯净产品体验'],
-            ['贴心', '沉浸式且一致', ['构建 F 型浏览动线', '首屏提供 3D 裸眼体验', '强化 1+8+车互动体验', '保持小程序、Web 与 iOS 多端一致', '用微动效强化状态反馈'], '/assets/ideal-vmall/strategy/care.jpg', '鲜花与宠物主题的年轻生活方式影像'],
-            ['高品质', '呈现质感打磨', ['降低信息密度', '控制颜色使用比例', '全面升级样式控件与组件', '规范内容质量标准', '减少二次创作素材'], '/assets/ideal-vmall/strategy/quality.jpg', '高端室内场景中的品质产品体验'],
+            ['纯净', '坚持少即是多', ['页面定位清晰', '净化页面空间', '以用户视角呈现信息', '减少重复页面与内容', '保留呼吸感留白'], assetPath('/assets/ideal-vmall/strategy/purity.jpg'), '户外移动场景中的纯净产品体验'],
+            ['贴心', '沉浸式且一致', ['构建 F 型浏览动线', '首屏提供 3D 裸眼体验', '强化 1+8+车互动体验', '保持小程序、Web 与 iOS 多端一致', '用微动效强化状态反馈'], assetPath('/assets/ideal-vmall/strategy/care.jpg'), '鲜花与宠物主题的年轻生活方式影像'],
+            ['高品质', '呈现质感打磨', ['降低信息密度', '控制颜色使用比例', '全面升级样式控件与组件', '规范内容质量标准', '减少二次创作素材'], assetPath('/assets/ideal-vmall/strategy/quality.jpg'), '高端室内场景中的品质产品体验'],
           ].map(([title, subtitle, items, image, imageAlt]) => (
             <article className="ideal-vmall-direction__card ideal-vmall-reveal" key={title}>
               <figure className="ideal-vmall-direction__visual"><img src={image} alt={imageAlt} loading="lazy" decoding="async" /></figure>
@@ -1384,9 +1385,9 @@ function IdealVmallDetail({ project }) {
             </div>
             <div className="ideal-vmall-detail-analysis__phones" aria-label="现网关键页面">
               {[
-                ['/assets/ideal-vmall/detail-analysis/current-page.jpg', '商品详情基础页面', '基础页面', '产品、价格与促销在首屏同时争夺注意力'],
-                ['/assets/ideal-vmall/detail-analysis/offer-sheet.jpg', '商品详情优惠弹窗', '优惠弹窗', '优惠券、赠品和促销规则形成新的信息层级'],
-                ['/assets/ideal-vmall/detail-analysis/sku-sheet.jpg', '商品详情选配弹窗', '选配弹窗', '颜色、版本、套餐与赠品集中在一次选择中'],
+                [assetPath('/assets/ideal-vmall/detail-analysis/current-page.jpg'), '商品详情基础页面', '基础页面', '产品、价格与促销在首屏同时争夺注意力'],
+                [assetPath('/assets/ideal-vmall/detail-analysis/offer-sheet.jpg'), '商品详情优惠弹窗', '优惠弹窗', '优惠券、赠品和促销规则形成新的信息层级'],
+                [assetPath('/assets/ideal-vmall/detail-analysis/sku-sheet.jpg'), '商品详情选配弹窗', '选配弹窗', '颜色、版本、套餐与赠品集中在一次选择中'],
               ].map(([image, alt, label, body]) => (
                 <figure key={label}>
                   <div><img src={image} alt={alt} loading="lazy" decoding="async" /></div>
@@ -1417,8 +1418,8 @@ function IdealVmallDetail({ project }) {
                 ['操作步骤更繁琐，学习成本相对较高', false],
               ],
               pages: [
-                ['/assets/ideal-vmall/plan-comparison/separated-detail.jpg', '看购分离方案详情页'],
-                ['/assets/ideal-vmall/plan-comparison/separated-purchase.jpg', '看购分离方案选购页'],
+                [assetPath('/assets/ideal-vmall/plan-comparison/separated-detail.jpg'), '看购分离方案详情页'],
+                [assetPath('/assets/ideal-vmall/plan-comparison/separated-purchase.jpg'), '看购分离方案选购页'],
               ],
             },
             {
@@ -1432,8 +1433,8 @@ function IdealVmallDetail({ project }) {
                 ['页面信息容易杂乱，体验深度不足', false],
               ],
               pages: [
-                ['/assets/ideal-vmall/plan-comparison/mainstream-detail.jpg', '主流电商方案详情页'],
-                ['/assets/ideal-vmall/plan-comparison/mainstream-purchase.jpg', '主流电商方案选购页'],
+                [assetPath('/assets/ideal-vmall/plan-comparison/mainstream-detail.jpg'), '主流电商方案详情页'],
+                [assetPath('/assets/ideal-vmall/plan-comparison/mainstream-purchase.jpg'), '主流电商方案选购页'],
               ],
             },
           ].map(plan => (
@@ -1540,7 +1541,7 @@ function DetailAnalysisScroller() {
           aria-label="滚动查看现网商品详情页完整长图"
           tabIndex="0"
         >
-          <img src="/assets/ideal-vmall/detail-analysis/full-page.jpg" alt="现网商品详情页完整长图" loading="lazy" decoding="async" />
+          <img src={assetPath('/assets/ideal-vmall/detail-analysis/full-page.jpg')} alt="现网商品详情页完整长图" loading="lazy" decoding="async" />
         </div>
       </div>
     </section>
@@ -1561,9 +1562,9 @@ function DetailPositioningScroller() {
       body: '用 3D、视频与多角度图片建立第一眼认知，先讲清产品，再进入购买信息。',
       layout: 'products',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/product-main.jpg', 'HUAWEI Pura 70 Ultra 产品正反面展示'],
-        ['/assets/ideal-vmall/detail-positioning/product-3d.jpg', 'HUAWEI Pura 70 Ultra 三维探索入口'],
-        ['/assets/ideal-vmall/detail-positioning/product-video.jpg', 'HUAWEI Pura 70 Ultra 镜头细节视频'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/product-main.jpg'), 'HUAWEI Pura 70 Ultra 产品正反面展示'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/product-3d.jpg'), 'HUAWEI Pura 70 Ultra 三维探索入口'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/product-video.jpg'), 'HUAWEI Pura 70 Ultra 镜头细节视频'],
       ],
     },
     {
@@ -1571,10 +1572,10 @@ function DetailPositioningScroller() {
       body: '统一新品、拼团、价保与订金等活动表达，让价格、卖点和优惠在同一决策区内有序出现。',
       layout: 'strips',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/promo-presale.jpg', '新品预售活动模块'],
-        ['/assets/ideal-vmall/detail-positioning/promo-group.jpg', '拼团活动模块'],
-        ['/assets/ideal-vmall/detail-positioning/promo-price.jpg', '价保活动模块'],
-        ['/assets/ideal-vmall/detail-positioning/promo-deposit.jpg', '订金活动模块'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/promo-presale.jpg'), '新品预售活动模块'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/promo-group.jpg'), '拼团活动模块'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/promo-price.jpg'), '价保活动模块'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/promo-deposit.jpg'), '订金活动模块'],
       ],
     },
     {
@@ -1582,8 +1583,8 @@ function DetailPositioningScroller() {
       body: '把已选配置、推荐搭配、换新与配送信息前置，让用户在离开页面前完成关键判断。',
       layout: 'delivery',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/delivery-default.jpg', '默认配送信息'],
-        ['/assets/ideal-vmall/detail-positioning/delivery-selected.jpg', '展开后的配送方式信息'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/delivery-default.jpg'), '默认配送信息'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/delivery-selected.jpg'), '展开后的配送方式信息'],
       ],
     },
     {
@@ -1591,8 +1592,8 @@ function DetailPositioningScroller() {
       body: '将服务说明和资质证明放在可验证的独立层级，用真实凭证持续加固购买决策。',
       layout: 'services',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/service-details.jpg', '服务说明页面'],
-        ['/assets/ideal-vmall/detail-positioning/service-certificate.jpg', '服务资质证明页面'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/service-details.jpg'), '服务说明页面'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/service-certificate.jpg'), '服务资质证明页面'],
       ],
     },
     {
@@ -1600,8 +1601,8 @@ function DetailPositioningScroller() {
       body: '参数负责确认性能，规则负责消除疑问；长文本分组承载，不与核心购买信息争夺注意力。',
       layout: 'rules',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/rules-agreement.jpg', '华为商城服务协议'],
-        ['/assets/ideal-vmall/detail-positioning/rules-notice.jpg', '商品参数与规则说明'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/rules-agreement.jpg'), '华为商城服务协议'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/rules-notice.jpg'), '商品参数与规则说明'],
       ],
     },
     {
@@ -1609,10 +1610,10 @@ function DetailPositioningScroller() {
       body: '底部操作区根据预售、缺货、加购与立即购买状态响应，让下一步始终明确。',
       layout: 'actions',
       assets: [
-        ['/assets/ideal-vmall/detail-positioning/action-buy.jpg', '立即购买状态'],
-        ['/assets/ideal-vmall/detail-positioning/action-countdown.jpg', '预售倒计时状态'],
-        ['/assets/ideal-vmall/detail-positioning/action-out-of-stock.jpg', '暂时缺货状态'],
-        ['/assets/ideal-vmall/detail-positioning/action-cart.jpg', '加购与立即购买状态'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/action-buy.jpg'), '立即购买状态'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/action-countdown.jpg'), '预售倒计时状态'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/action-out-of-stock.jpg'), '暂时缺货状态'],
+        [assetPath('/assets/ideal-vmall/detail-positioning/action-cart.jpg'), '加购与立即购买状态'],
       ],
     },
   ];
@@ -1676,7 +1677,7 @@ function DetailPositioningScroller() {
               <div className="ideal-vmall-positioning__page-viewport" ref={interactionViewportRef}>
                 <img
                   ref={interactionImageRef}
-                  src="/assets/ideal-vmall/detail-positioning/interaction-page.jpg"
+                  src={assetPath('/assets/ideal-vmall/detail-positioning/interaction-page.jpg')}
                   alt="HUAWEI Pura 70 Ultra 交互页面"
                   loading="lazy"
                   decoding="async"
@@ -1689,7 +1690,7 @@ function DetailPositioningScroller() {
               <div className="ideal-vmall-positioning__page-viewport" ref={visualViewportRef}>
                 <img
                   ref={visualImageRef}
-                  src="/assets/ideal-vmall/detail-positioning/full-page.jpg"
+                  src={assetPath('/assets/ideal-vmall/detail-positioning/full-page.jpg')}
                   alt="HUAWEI Pura 70 Ultra 视觉页面"
                   loading="lazy"
                   decoding="async"
@@ -1774,7 +1775,7 @@ function DetailPageShowcase() {
               {column.map(([file, alt]) => (
                 <figure key={file}>
                   <img
-                    src={`/assets/ideal-vmall/detail-showcase/${file}`}
+                    src={assetPath(`/assets/ideal-vmall/detail-showcase/${file}`)}
                     alt={alt}
                     loading="lazy"
                     decoding="async"
@@ -1835,7 +1836,7 @@ function OrderCurrentAnalysis() {
               <figcaption>{label}</figcaption>
               <div>
                 <img
-                  src={`/assets/ideal-vmall/order-current/${file}`}
+                  src={assetPath(`/assets/ideal-vmall/order-current/${file}`)}
                   alt={alt}
                   loading="lazy"
                   decoding="async"
@@ -1859,7 +1860,7 @@ function OrderPageShowcase() {
       <section className="case-visual-section ideal-vmall-order-showcase" aria-label="订单页面呈现">
         <img
           className="ideal-vmall-order-showcase__composite"
-          src="/assets/ideal-vmall/order-showcase/order-pages-composite.jpg"
+          src={assetPath('/assets/ideal-vmall/order-showcase/order-pages-composite.jpg')}
           alt="订单中心、订单详情与物流状态页面组合展示"
           loading="lazy"
           decoding="async"
@@ -2005,7 +2006,7 @@ function UomDetail({ project }) {
               <p>主色采用具有沉稳、可靠含义的深蓝色，用于需要突出的文字、按钮和 ICON 等。</p>
             </div>
             <figure className="uom-system__media">
-              <img src="/assets/uom/component-system/color-system.jpg" alt="UOM 主色、状态色与文字色规范" />
+              <img src={assetPath('/assets/uom/component-system/color-system.jpg')} alt="UOM 主色、状态色与文字色规范" />
             </figure>
           </section>
 
@@ -2015,7 +2016,7 @@ function UomDetail({ project }) {
               <p>字体默认使用鸿蒙黑体；若涉及不同浏览器及系统无法应用鸿蒙黑体，则使用微软雅黑替代。</p>
             </div>
             <figure className="uom-system__media">
-              <img src="/assets/uom/component-system/typography-system.svg" alt="UOM 中文、英文与数字字体规范" />
+              <img src={assetPath('/assets/uom/component-system/typography-system.svg')} alt="UOM 中文、英文与数字字体规范" />
             </figure>
           </section>
 
@@ -2025,7 +2026,7 @@ function UomDetail({ project }) {
               <p>系统图标以 64 × 64 px 为设计参考；图标绘制区域为 64 × 64 px，图标比例约束参考下图。</p>
             </div>
             <figure className="uom-system__media">
-              <img src="/assets/uom/component-system/icon-system.svg" alt="UOM 图标尺寸、比例与类型规范" />
+              <img src={assetPath('/assets/uom/component-system/icon-system.svg')} alt="UOM 图标尺寸、比例与类型规范" />
             </figure>
           </section>
 
@@ -2035,7 +2036,7 @@ function UomDetail({ project }) {
               <p>栅格系统用于辅助设计师进行页面布局。当前提供 Web 端 1700 px（1920 px 画布减去 220 px 左侧菜单）的布局参考。</p>
             </div>
             <figure className="uom-system__media">
-              <img src="/assets/uom/component-system/grid-system.svg" alt="UOM Web 端十二列栅格布局规范" />
+              <img src={assetPath('/assets/uom/component-system/grid-system.svg')} alt="UOM Web 端十二列栅格布局规范" />
             </figure>
           </section>
 
@@ -2045,7 +2046,7 @@ function UomDetail({ project }) {
               <p>布局样式是产品页面的重要构成。VMALL 运营管理后台统一采用固定侧边栏与自适应内容区，页面边距为 20 px，模块上下间距为 12 px。</p>
             </div>
             <figure className="uom-system__media">
-              <img src="/assets/uom/component-system/sidebar-layout.png" alt="UOM 侧边菜单与后台页面布局规范" />
+              <img src={assetPath('/assets/uom/component-system/sidebar-layout.png')} alt="UOM 侧边菜单与后台页面布局规范" />
             </figure>
           </section>
         </div>
@@ -2062,7 +2063,7 @@ function UomDetail({ project }) {
               <p>常规按钮最小宽度为 96 px，小尺寸按钮最小宽度为 52 px，最大宽度均为 220 px；按钮宽度随文字动态扩展，超长文字省略处理，多个按钮间的水平间距为 12 px。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/button-system.svg" alt="UOM 按钮类型、尺寸与交互状态规范" />
+              <img src={assetPath('/assets/uom/component-system/button-system.svg')} alt="UOM 按钮类型、尺寸与交互状态规范" />
             </figure>
           </section>
 
@@ -2072,7 +2073,7 @@ function UomDetail({ project }) {
               <p>输入框用于内容录入：在过滤框架中采用标签在上、输入区在下的上下结构；在表单框架中采用标签在左、输入区在右的左右结构。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/input-system.svg" alt="UOM 输入框结构、尺寸与状态规范" />
+              <img src={assetPath('/assets/uom/component-system/input-system.svg')} alt="UOM 输入框结构、尺寸与状态规范" />
             </figure>
           </section>
 
@@ -2082,7 +2083,7 @@ function UomDetail({ project }) {
               <p>下拉菜单默认显示水印文本；点击下拉箭头并选中特定项目后，水印文本消失。置灰状态下，下拉菜单不可操作。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/select-system.svg" alt="UOM 下拉菜单单选、多选与搜索状态规范" />
+              <img src={assetPath('/assets/uom/component-system/select-system.svg')} alt="UOM 下拉菜单单选、多选与搜索状态规范" />
             </figure>
           </section>
 
@@ -2092,7 +2093,7 @@ function UomDetail({ project }) {
               <p>根据选项的功能属性，提供单选框与多选框两种样式；在最大宽度内最多展示一行，超长内容截断处理。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/checkbox-system.svg" alt="UOM 单选框与多选框状态及布局规范" />
+              <img src={assetPath('/assets/uom/component-system/checkbox-system.svg')} alt="UOM 单选框与多选框状态及布局规范" />
             </figure>
           </section>
 
@@ -2102,7 +2103,7 @@ function UomDetail({ project }) {
               <p>时间选择器提供手动输入与选择输入两种方式，并支持时间段、快捷时间范围及时分秒的精确选择。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/date-time-system.svg" alt="UOM 时间段、快捷范围与时分秒选择规范" />
+              <img src={assetPath('/assets/uom/component-system/date-time-system.svg')} alt="UOM 时间段、快捷范围与时分秒选择规范" />
             </figure>
           </section>
 
@@ -2112,7 +2113,7 @@ function UomDetail({ project }) {
               <p>地址选择框与输入框保持一致；在最大宽度内最多展示一行，超长内容截断，悬停时可查看完整文案。实现时优先复用系统已有控件。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/address-system.svg" alt="UOM 地址选择器输入与多级选择规范" />
+              <img src={assetPath('/assets/uom/component-system/address-system.svg')} alt="UOM 地址选择器输入与多级选择规范" />
             </figure>
           </section>
 
@@ -2122,7 +2123,7 @@ function UomDetail({ project }) {
               <p>文件上传支持图片预览与文件列表两种展示形式；上传前明确提示支持的格式、文件数量和大小限制，上传后提供清晰的预览、修改与移除操作。</p>
             </div>
             <figure className="uom-controls__media">
-              <img src="/assets/uom/component-system/upload-system.svg" alt="UOM 图片预览与文件列表上传规范" />
+              <img src={assetPath('/assets/uom/component-system/upload-system.svg')} alt="UOM 图片预览与文件列表上传规范" />
             </figure>
           </section>
         </div>
@@ -2844,7 +2845,7 @@ function VmallLanguageCover({ detail = false }) {
     <div className={`vmall-language-cover ${detail ? 'vmall-language-cover--detail' : ''}`} aria-hidden="true">
       <img
         className="vmall-language-cover__image"
-        src="/assets/vmall-language-system/cover-language-mockup.png"
+        src={assetPath('/assets/vmall-language-system/cover-language-mockup.png')}
         alt=""
       />
     </div>
@@ -2896,7 +2897,7 @@ function AppIconGuideDetail({ project }) {
         <figure className="app-icon-geometry__card">
           <img
             className="app-icon-geometry__image"
-            src="/assets/app-icon-guide/geometric-structure.svg"
+            src={assetPath('/assets/app-icon-guide/geometric-structure.svg')}
             alt="FunnFuzzy APP 图标方形与圆形几何结构规范"
           />
         </figure>
@@ -2957,7 +2958,7 @@ function AppIconGuideDetail({ project }) {
         </div>
         <figure className="app-icon-application__image">
           <img
-            src="/assets/app-icon-guide/application-showcase.jpg"
+            src={assetPath('/assets/app-icon-guide/application-showcase.jpg')}
             alt="FunnFuzzy APP 图标实际应用展示"
           />
         </figure>
@@ -3124,7 +3125,7 @@ function AppIconGuideBoard() {
   return (
     <div className="app-icon-board">
       <div className="app-icon-board__brand">
-        <img src="/assets/app-icon-guide/ff-logo.svg" alt="FunnFuzzy logo" />
+        <img src={assetPath('/assets/app-icon-guide/ff-logo.svg')} alt="FunnFuzzy logo" />
       </div>
       <AnimatedIconGrid className="app-icon-board__grid" />
     </div>
@@ -3418,19 +3419,19 @@ function CodexWorkflowSection() {
     {
       title: '把模糊需求拆成系统边界',
       body: '用 Codex 辅助梳理「产品页识别、飞书绑定查询、NAS 路径打开、SPU 表定位」四段链路，把原本只是在页面加编号的需求，转成内部插件 + 查询服务的方案。',
-      image: '/assets/codex-summary-system-boundary.png',
+      image: assetPath('/assets/codex-summary-system-boundary.png'),
       imageAlt: '文件卡片收纳盒图形'
     },
     {
       title: '把异常和维护前置',
       body: '从原项目中沉淀加载中、未绑定、服务异常、错误诊断复制、NAS 路径跨平台处理等状态，让非技术同事和管理员都知道下一步该做什么。',
-      image: '/assets/codex-summary-workflow.png',
+      image: assetPath('/assets/codex-summary-workflow.png'),
       imageAlt: '流程节点转化图形'
     },
     {
       title: '用测试约束 AI 生成结果',
       body: '项目包含面板、产品页识别、NAS 路径、飞书客户端、绑定解析和接口服务 6 组测试，用可验证的用例校准 Codex 输出，避免只停留在原型。',
-      image: '/assets/codex-summary-validation.png',
+      image: assetPath('/assets/codex-summary-validation.png'),
       imageAlt: '数据分析放大镜图形'
     }
   ];
@@ -3579,7 +3580,7 @@ function HuaweiCloudCover({ project }) {
     );
   }
 
-  const src = project.coverImage || '/assets/huawei-cloud/cover.jpg';
+  const src = project.coverImage || assetPath('/assets/huawei-cloud/cover.jpg');
   const alt = project.coverImageAlt || '';
 
   if (project.coverLogo) {
@@ -3610,7 +3611,7 @@ function AppIconGuideCover() {
   return (
     <div className="app-icon-cover" aria-hidden="true">
       <div className="app-icon-cover__brand">
-        <img src="/assets/app-icon-guide/ff-logo.svg" alt="" />
+        <img src={assetPath('/assets/app-icon-guide/ff-logo.svg')} alt="" />
       </div>
       <AnimatedIconGrid className="app-icon-cover__panel" />
     </div>
