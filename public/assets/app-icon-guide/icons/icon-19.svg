@@ -1,0 +1,22 @@
+<svg viewBox="0 0 40.3045 40.3047" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40.304504" height="40.304688" fill="none">
+	<defs>
+		<filter id="pixso_custom_mask_type_alpha">
+			<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0 " />
+		</filter>
+	</defs>
+	<mask id="mask_3" width="40.304501" height="40.304493" x="0.000000" y="0.000000" maskUnits="userSpaceOnUse">
+		<g filter="url(#pixso_custom_mask_type_alpha)">
+			<g id="clip0_161_5018">
+				<rect id="矩形 126" width="40.304501" height="40.304493" x="0.000000" y="0.000000" fill="rgb(0,0,0)" />
+			</g>
+		</g>
+	</mask>
+	<rect id="Order 1" width="40.304501" height="40.304493" x="0.000000" y="0.000000" />
+	<g id="clip path group" mask="url(#mask_3)">
+		<g id="组合 122">
+			<path id="矢量 94" d="M32.7473 35.2666L26.8697 31.9077L20.1522 36.1061L13.4348 31.9077L7.55709 35.2666L5.03806 36.7061L5.03806 33.8047L5.03815 5.03809L35.2663 5.03809L35.2663 36.7061L32.7473 35.2666ZM26.8118 28.9733L20.1522 33.1355L13.4927 28.9733L7.55709 32.3653L7.55717 7.55712L32.7473 7.55712L32.7473 32.3653L26.8118 28.9733Z" fill="rgb(0,0,0)" fill-rule="evenodd" />
+			<path id="矢量 95" d="M24.3506 15.1143L15.9539 15.1143L15.9539 17.6333L24.3506 17.6333L24.3506 15.1143Z" fill="rgb(0,0,0)" fill-rule="evenodd" />
+			<path id="矢量 96" d="M24.3506 19.3125L15.9539 19.3125L15.9539 21.8315L24.3506 21.8315L24.3506 19.3125Z" fill="rgb(0,0,0)" fill-rule="evenodd" />
+		</g>
+	</g>
+</svg>

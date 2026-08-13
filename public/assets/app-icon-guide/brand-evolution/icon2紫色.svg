@@ -1,0 +1,30 @@
+<svg viewBox="0 0 128.048 128.048" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128.047729" height="128.047852" fill="none">
+	<defs>
+		<clipPath id="clipPath_13">
+			<rect width="128.047745" height="128.047714" x="0.000000" y="0.000000" fill="rgb(255,255,255)" />
+		</clipPath>
+	</defs>
+	<rect id="icon2紫色" width="128.047760" height="128.047729" x="0.000000" y="0.000000" fill="rgb(255,255,255)" fill-opacity="0" />
+	<g id="ICON/basic" opacity="0" clip-path="url(#clipPath_13)" customFrame="url(#clipPath_13)">
+		<rect id="ICON/basic" width="128.047745" height="128.047714" x="0.000000" y="0.000000" fill="rgb(255,255,255)" />
+		<rect id="矩形 43" width="101.371132" height="90.700462" x="13.338257" y="18.673828" rx="10.670645" fill="rgb(196,196,196)" fill-opacity="0" />
+		<rect id="矩形 43" width="100.837601" height="90.166931" x="13.605023" y="18.940594" rx="10.403878" stroke="rgb(255,0,213)" stroke-width="0.533532" />
+		<rect id="矩形 44" width="101.371109" height="90.700493" x="0.000000" y="0.000000" rx="10.670645" fill="rgb(196,196,196)" fill-opacity="0" transform="matrix(0,1,-1,0,109.374,13.3379)" />
+		<rect id="矩形 44" width="100.837578" height="90.166962" x="0.266766" y="0.266766" rx="10.403878" stroke="rgb(255,0,213)" stroke-width="0.533532" transform="matrix(0,1,-1,0,109.374,13.3379)" />
+		<rect id="矩形 45" width="96.035789" height="96.035812" x="0.000000" y="0.000000" rx="10.670645" fill="rgb(196,196,196)" fill-opacity="0" transform="matrix(0,1,-1,0,112.042,16.0059)" />
+		<rect id="矩形 45" width="95.502258" height="95.502281" x="0.266766" y="0.266766" rx="10.403878" stroke="rgb(255,0,213)" stroke-width="0.533532" transform="matrix(0,1,-1,0,112.042,16.0059)" />
+		<ellipse id="椭圆 25" rx="53.353230" ry="53.353214" cx="64.02388" cy="64.0241089" fill="rgb(196,196,196)" fill-opacity="0" />
+		<ellipse id="椭圆 25" rx="53.086464" ry="53.086449" cx="64.02388" cy="64.0241089" stroke="rgb(255,0,213)" stroke-width="0.533532" />
+		<path id="矢量 13" d="M128.048 0L128.048 128.048L0 128.048L0 0L128.048 0ZM10.6706 10.6706L10.6706 117.377L117.377 117.377L117.377 10.6706L10.6706 10.6706Z" fill="rgb(255,0,213)" fill-opacity="0.200000003" fill-rule="evenodd" />
+		<path id="矢量 13" d="M128.048 0L128.048 128.048L0 128.048L0 0L128.048 0ZM125.38 125.38L125.38 2.66766L2.66766 2.66766L2.66766 125.38L125.38 125.38ZM8.00299 8.00298L120.045 8.00298L120.045 120.045L8.00299 120.045L8.00299 8.00298ZM10.6706 10.6706L10.6706 117.377L117.377 117.377L117.377 10.6706L10.6706 10.6706Z" fill="rgb(255,0,213)" fill-opacity="0" fill-rule="evenodd" />
+		<line id="直线 43" x1="10.6706543" x2="117.377113" y1="64.0234375" y2="64.0234375" stroke="rgb(255,0,206)" stroke-width="0.533532" />
+		<line id="直线 44" x1="0" x2="106.706429" y1="0" y2="0" stroke="rgb(255,0,206)" stroke-width="0.533532" transform="matrix(0,-1,1,0,64.0239,117.377)" />
+	</g>
+	<path id="直线 16(边框)" d="M39.3982 0L35.4039 0.239845L35.3507 0.243042L4.04756 2.12269L3.9943 2.12589L0 2.36574L0.479676 10.3546L4.47397 10.1147L4.52723 10.1115L35.8303 8.23186L35.8836 8.22866L39.8779 7.98882L39.3982 0Z" fill="rgb(0,0,0)" fill-opacity="0" fill-rule="evenodd" transform="matrix(-0.707105,0.707108,0.701787,0.712387,108.073,15.3213)" />
+	<rect id="矩形 67" width="61.356209" height="8.002982" x="16.005981" y="16.005859" fill="rgb(0,0,0)" fill-opacity="0" />
+	<rect id="矩形 69" width="88.032806" height="8.002984" x="0.000000" y="0.000000" fill="rgb(0,0,0)" fill-opacity="0" transform="matrix(0,1,-1,0,24.0089,16.0059)" />
+	<rect id="矩形 70" width="50.685555" height="8.002984" x="0.000000" y="0.000000" fill="rgb(0,0,0)" fill-opacity="0" transform="matrix(0,1,-1,0,112.042,53.3535)" />
+	<rect id="矩形 68" width="96.035812" height="8.002982" x="16.005981" y="104.039062" fill="rgb(0,0,0)" fill-opacity="0" />
+	<rect id="矩形 95" width="24.008953" height="8.002982" x="16.005981" y="16.005859" fill="rgb(255,0,206)" />
+	<rect id="矩形 96" width="24.008947" height="8.002984" x="0.000000" y="0.000000" fill="rgb(255,0,206)" transform="matrix(0,1,-1,0,24.0089,16.0059)" />
+</svg>

@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+dist/
+.playwright-cli/
+.qa-*.png
+tmp/
+output/
+outputs/
+FunnFuzzy APP icon design guide/
+docs/superpowers/
+
+# Keep the optimized photography images used by the site, skip local originals.
+public/assets/photography/*.jpg
