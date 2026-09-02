@@ -1,4 +1,4 @@
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const basePath = (import.meta.env?.BASE_URL ?? '/').replace(/\/$/, '');
 
 export function assetPath(path) {
   if (typeof path !== 'string' || !path.startsWith('/assets/')) {

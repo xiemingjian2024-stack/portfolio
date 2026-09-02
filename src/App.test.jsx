@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App.jsx';
-import { navItems, portfolioSections, photographyItems, profile } from './portfolioData.js';
+import { caseFactTokens, navItems, portfolioSections, photographyItems, profile } from './portfolioData.js';
 
 function renderAt(route) {
   return render(
@@ -42,6 +42,11 @@ describe('portfolio configuration', () => {
       '/about',
       '/contact'
     ]);
+  });
+
+  it('defines the shared case header fact tokens in order', () => {
+    expect(caseFactTokens.map((token) => token.key)).toEqual(['brand', 'status', 'role', 'scope']);
+    expect(caseFactTokens.map((token) => token.label)).toEqual(['品牌', '状态', '角色', '范围']);
   });
 
   it('centers the desktop content width on wide screens like the reference', async () => {
@@ -98,14 +103,30 @@ describe('portfolio configuration', () => {
     expect(photographyItems.length).toBeGreaterThanOrEqual(8);
   });
 
-  it('keeps the APP project order curated for the portfolio page', () => {
+  it('keeps projects sorted from newest to oldest inside each category', () => {
+    const getNewestYear = (year) => Math.max(...String(year).match(/\d{4}/g).map(Number));
+
+    Object.values(portfolioSections).forEach((section) => {
+      const years = section.projects.map((project) => getNewestYear(project.year));
+      expect(years).toEqual([...years].sort((firstYear, secondYear) => secondYear - firstYear));
+    });
+
     expect(portfolioSections.app.projects.map((project) => project.title)).toEqual([
       'FunnFuzzy APP icon design guide',
       '理想中的华为商城',
       '界面用语规范',
-      '华为商城智能客服',
       'V+ 会员',
+      '华为商城智能客服',
       '北极星数据监控平台'
+    ]);
+
+    expect(portfolioSections.web.projects.map((project) => project.title)).toEqual([
+      'FunnyFuzzy商城首页设计',
+      'Amazon店铺首页设计',
+      'UOM',
+      '布家班',
+      '华为云产品页设计',
+      '华为云活动页设计'
     ]);
   });
 });
@@ -145,7 +166,7 @@ describe('portfolio routes', () => {
     expect(portfolioSections.web.projects.every((project) => project.caseStudy)).toBe(true);
     expect(portfolioSections.ai.projects.every((project) => project.caseStudy)).toBe(true);
     expect(screen.getAllByRole('link', { name: 'Case Study' })[0]).toHaveClass('case-link');
-    expect(screen.getAllByText('2026').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('2025').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/APP/i).length).toBeGreaterThan(0);
   });
 
@@ -233,7 +254,7 @@ describe('portfolio routes', () => {
     });
   });
 
-  it('presents the product asset locator as the first AI case study', () => {
+  it('keeps the product asset locator in the AI case studies', () => {
     renderAt('/ai');
 
     expect(screen.getByRole('link', { name: /产品素材快速定位工具/i })).toHaveAttribute(
@@ -241,6 +262,102 @@ describe('portfolio routes', () => {
       '/project/ai-product-assets-locator'
     );
     expect(screen.getByText(/从产品页快速找到 SPU 与 NAS 素材/i)).toBeInTheDocument();
+  });
+
+  it('adds the local AI material collector with its application logo and a complete case narrative', () => {
+    const { unmount } = renderAt('/ai');
+    const cover = screen.getByRole('link', { name: '谢小屯 — AI 素材采集器' });
+
+    expect(cover).toHaveClass('project-cover--material-collector');
+    expect(within(cover).getByRole('img', { name: '谢小屯应用 Logo' })).toHaveAttribute(
+      'src',
+      '/assets/material-collector/cangshu-cover-icon.svg'
+    );
+    expect(cover.querySelector('.material-collector-cover__background')).toHaveAttribute(
+      'src',
+      '/assets/material-collector/cover-grid-background.png'
+    );
+    expect(within(cover).queryByText('谢小屯')).not.toBeInTheDocument();
+    expect(cover).toHaveAttribute('href', '/project/ai-material-collector');
+
+    unmount();
+    renderAt('/project/ai-material-collector');
+
+    expect(screen.getByRole('heading', { name: '谢小屯 — AI 素材采集器' })).toBeInTheDocument();
+    expect(document.querySelector('.detail-cover--material-collector')).toContainElement(
+      screen.getByRole('img', { name: '谢小屯应用 Logo' })
+    );
+    expect(screen.getByRole('heading', { name: /把“采集—理解—纠正—再利用”收进本地.*逐步长成贴近个人工作方式的素材系统/ })).toBeInTheDocument();
+    expect(screen.queryByText('项目思路')).not.toBeInTheDocument();
+    expect(screen.queryByText(/不是再做一个云端收藏夹/)).not.toBeInTheDocument();
+    const workflow = screen.getByRole('list', { name: '采集到偏好学习的五步闭环' });
+    expect(screen.queryByText('我负责采集与校准，让模型从每次选择中持续学习')).not.toBeInTheDocument();
+    expect(screen.queryByText('工作流角色')).not.toBeInTheDocument();
+    expect(screen.queryByText('本地模型参与')).not.toBeInTheDocument();
+    expect(within(workflow).getAllByRole('listitem')).toHaveLength(5);
+    expect(within(workflow).getByText('我选择参与')).toBeInTheDocument();
+    expect(within(workflow).getByText('检索与复用')).toBeInTheDocument();
+    expect(within(workflow).getAllByText('我参与')).toHaveLength(1);
+    expect(within(workflow).getAllByText('本地模型')).toHaveLength(2);
+    expect(within(workflow).getByText('自动执行')).toBeInTheDocument();
+    expect(screen.queryByText('偏好回流')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '设计背景' })).toBeInTheDocument();
+    expect(screen.getByText(/花瓣承接了日常灵感收藏，却没有完全接上本地工作流/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '跨平台采集受限' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '本地归档需要维护' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '分类与标签成本高' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '列表页直取原始大图' })).toBeInTheDocument();
+    expect(screen.getByText(/Behance 等素材网站中直接解析卡片对应的大图地址/)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Behance 移动端界面设计作品列表页' })).toHaveAttribute(
+      'src',
+      '/assets/material-collector/behance-list-page-latest.png'
+    );
+    const collectButton = screen.getByRole('button', { name: '采集素材' });
+    expect(collectButton).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(collectButton);
+    expect(collectButton).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('已存入素材库');
+    expect(screen.getByRole('heading', { name: '制定标签逻辑' })).toBeInTheDocument();
+    expect(screen.getByText(/先判断素材是什么，再决定该用哪些标签。分类不是一次模型调用/)).toBeInTheDocument();
+    expect(screen.queryByText('04 / 设计过程 · 标签判断逻辑制定')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('本地模型标签判断树')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Qwen3-VL 2B · 4-bit' })).toBeInTheDocument();
+    expect(screen.getByText('UI 置信度 ≥ 0.80')).toBeInTheDocument();
+    expect(screen.getByText('页面类型 ≤ 1')).toBeInTheDocument();
+    expect(screen.getByText('人工新增', { selector: 'strong' })).toBeInTheDocument();
+    expect(screen.getByText('人工删除', { selector: 'strong' })).toBeInTheDocument();
+    expect(screen.queryByText('05 / 设计过程 · 浏览')).not.toBeInTheDocument();
+    expect(screen.queryByText('06 / 设计过程 · 学习')).not.toBeInTheDocument();
+    expect(screen.queryByText('07 / 协作与同步 / 可扩展路线')).not.toBeInTheDocument();
+    expect(screen.queryByText('08 / 项目成果')).not.toBeInTheDocument();
+    const learningHeading = screen.getByRole('heading', { name: '让人工判断始终高于自动判断' });
+    const collaborationHeading = screen.getByRole('heading', { name: '从本地优先出发，逐步长出协作能力' });
+    expect(learningHeading.compareDocumentPosition(collaborationHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('img', { name: '谢小屯本地素材库瀑布流首页' })).toHaveAttribute(
+      'src',
+      '/assets/material-collector/library-home-labeled.png'
+    );
+    expect(screen.getByRole('img', { name: '谢小屯素材详情与标签修正界面' })).toHaveAttribute(
+      'src',
+      '/assets/material-collector/library-detail-latest.png'
+    );
+    expect(screen.getByRole('heading', { name: '工具对比' })).toBeInTheDocument();
+    expect(screen.getByText(/花瓣更像成熟的云端灵感平台，谢小屯更像贴身的本地工作台/)).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: '花瓣与谢小屯能力对比' })).toBeInTheDocument();
+    expect(screen.getByText(/分类、用途标签和属性识别由本地模型异步完成/)).toBeInTheDocument();
+    expect(screen.getByText('更纯粹')).toBeInTheDocument();
+    expect(screen.getByLabelText('协作与同步可扩展路线')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '共享素材包' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '用户自选同步源' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '共享标签词典' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '临时项目组' })).toBeInTheDocument();
+    expect(screen.getByText(/项目结束后可解散项目组，素材仍保留在个人素材库中/)).toBeInTheDocument();
+    expect(screen.getByText(/原文件直接进入用户指定文件夹/)).toBeInTheDocument();
+    expect(screen.queryByText(/谢小屯更好的地方，不是功能更多/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /最终，采集、理解、纠正与再利用成为一条连续的本地工作流/ })).not.toBeInTheDocument();
+    expect(screen.queryByText('47')).not.toBeInTheDocument();
+    expect(screen.queryByText('93')).not.toBeInTheDocument();
+    expect(screen.queryByText('57')).not.toBeInTheDocument();
   });
 
   it('adds the Amazon Store homepage case to Web with research, final designs, and result placeholders', () => {
@@ -261,7 +378,11 @@ describe('portfolio routes', () => {
       'src',
       '/assets/amazon-store-home/final-desktop-hq.jpg'
     );
-    expect(screen.getByRole('heading', { name: '移动端设计' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Amazon 店铺首页最终移动端完整方案/ })).toHaveAttribute(
+      'src',
+      '/assets/amazon-store-home/final-mobile.jpg'
+    );
+    expect(screen.getByRole('region', { name: '最终双端设计' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Chuckit!/i })).toHaveAttribute(
       'href',
       'https://www.thinknectar.com/case-studies/chuckit-gets-thrown-a-brand-store-makeover'
@@ -273,7 +394,196 @@ describe('portfolio routes', () => {
     expect(screen.getByText('研究结论')).toBeInTheDocument();
   });
 
-  it('adds UOM as the first Web case with evidence, system assets, and interactive planning', () => {
+  it('adds the FunnyFuzzy homepage case with real page assets, native explanations, and measured results', async () => {
+    const { unmount } = renderAt('/web');
+
+    const cover = screen.getByRole('link', { name: 'FunnyFuzzy商城首页设计' });
+    expect(cover).toHaveAttribute('href', '/project/web-funnyfuzzy-homepage');
+    expect(cover).not.toHaveClass('project-cover--placeholder');
+    expect(within(cover).getByRole('img', { name: '绿色沙发上的电脑展示 FunnyFuzzy 商城首页首屏' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/cover.png'
+    );
+    const projectMeta = within(screen.getByLabelText('FunnyFuzzy商城首页设计 信息'));
+    expect(projectMeta.getByText('2026')).toBeInTheDocument();
+    expect(projectMeta.getByText('网页设计')).toBeInTheDocument();
+
+    unmount();
+    renderAt('/project/web-funnyfuzzy-homepage');
+
+    expect(screen.getByRole('heading', { name: 'FunnyFuzzy商城首页设计' })).toBeInTheDocument();
+    expect(screen.getByText('FunnyFuzzy')).toBeInTheDocument();
+    expect(screen.getByText('设计与策略')).toBeInTheDocument();
+    expect(screen.getByText('研究、框架、设计')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'funnyfuzzy.com' })).toHaveAttribute(
+      'href',
+      'https://funnyfuzzy.com/'
+    );
+    expect(document.querySelector('.detail-cover--placeholder')).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: '绿色沙发上的电脑展示 FunnyFuzzy 商城首页首屏' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/cover.png'
+    );
+    expect(screen.getByText(/把 FunnyFuzzy 首页从商品与活动的堆叠/)).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: '项目概述' })).not.toBeInTheDocument();
+    const contextSection = screen.getByRole('region', { name: '首页改版任务' });
+    expect(within(contextSection).queryByRole('heading', { name: '项目背景与目标' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /重新定义.*首页的任务/ })).toBeInTheDocument();
+    expect(within(contextSection).queryByText('1人')).not.toBeInTheDocument();
+    expect(within(contextSection).getByText(/我负责研究、页面框架、视觉设计与双端适配/)).toBeInTheDocument();
+    const moodboard = screen.getByRole('region', { name: '视觉情绪版' });
+    expect(within(moodboard).getByRole('heading', { name: '视觉情绪版' })).toBeInTheDocument();
+    expect(within(moodboard).getAllByRole('img')).toHaveLength(3);
+    expect(within(moodboard).getByText('场景建立第一印象')).toBeInTheDocument();
+    expect(within(moodboard).getByText('层级引导浏览节奏')).toBeInTheDocument();
+    expect(within(moodboard).getByText('小圆角贴近生活物件')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '改版前体验诊断' })).toHaveClass('case-section-heading__title');
+    const beforeDesktop = screen.getByRole('img', { name: 'FunnyFuzzy 改版前桌面端首页' });
+    expect(beforeDesktop).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/before-desktop.webp'
+    );
+    expect(screen.getByLabelText('FunnyFuzzy 改版前桌面端首页 页面滚动预览')).toBeInTheDocument();
+    expect(screen.getByLabelText('FunnyFuzzy 改版前移动端首页 页面滚动预览')).toBeInTheDocument();
+    expect(screen.getByLabelText('改版前体验问题总结').children).toHaveLength(4);
+    const firstDiagnosis = screen.getByRole('heading', { name: '信息层级混杂' });
+    expect(beforeDesktop.compareDocumentPosition(firstDiagnosis) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByText('BEFORE / WEB')).not.toBeInTheDocument();
+    expect(screen.queryByText('BEFORE / WAP')).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: '方案 A桌面端首页完整设计' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/direction-a-desktop.webp'
+    );
+    expect(screen.getByText(/处于 F 型阅读动线以外区域的信息/)).toBeInTheDocument();
+    expect(screen.queryByText(/以明确的横向模块和线性顺序组织信息/)).not.toBeInTheDocument();
+    const directionSection = screen.getByRole('region', { name: '设计方向探索' });
+    const directionTabs = within(directionSection).getAllByRole('tab');
+    expect(directionTabs).toHaveLength(2);
+    expect(screen.getByRole('tab', { name: '方案 A' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: '方案 B' })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.queryByRole('img', { name: '方案 B桌面端首页完整设计' })).not.toBeInTheDocument();
+    const directionAScroller = screen.getByRole('region', { name: '滚动查看方案 A桌面端完整页面' });
+    const directionAMobileScroller = screen.getByRole('region', { name: '滚动查看方案 A移动端完整页面' });
+    expect(directionAScroller).toBeInTheDocument();
+    expect(directionAMobileScroller).toBeInTheDocument();
+    expect(directionAMobileScroller.compareDocumentPosition(directionAScroller) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const directionAChapter = directionAScroller.closest('.ff-direction-chapter');
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[0]).toHaveClass('is-active');
+    expect(within(directionAChapter).getByText(/尼尔森在 2006 年的网页眼动研究/)).toBeInTheDocument();
+    expect(within(directionAChapter).queryByText('商品承接')).not.toBeInTheDocument();
+    Object.defineProperties(directionAScroller, {
+      scrollHeight: { configurable: true, value: 1000 },
+      clientHeight: { configurable: true, value: 200 },
+      scrollTop: { configurable: true, value: 90 },
+    });
+    fireEvent.scroll(directionAScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[1]).toHaveClass('is-active');
+    Object.defineProperty(directionAScroller, 'scrollTop', { configurable: true, value: 240 });
+    fireEvent.scroll(directionAScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[2]).toHaveClass('is-active');
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[2]).toHaveTextContent('场景入口');
+    Object.defineProperty(directionAScroller, 'scrollTop', { configurable: true, value: 320 });
+    fireEvent.scroll(directionAScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[3]).toHaveClass('is-active');
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[3]).toHaveTextContent('宠物尺寸入口');
+    Object.defineProperty(directionAScroller, 'scrollTop', { configurable: true, value: 420 });
+    fireEvent.scroll(directionAScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[4]).toHaveClass('is-active');
+    Object.defineProperty(directionAScroller, 'scrollTop', { configurable: true, value: 760 });
+    fireEvent.scroll(directionAScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[5]).toHaveClass('is-active');
+    Object.defineProperties(directionAMobileScroller, {
+      scrollHeight: { configurable: true, value: 1200 },
+      clientHeight: { configurable: true, value: 240 },
+      scrollTop: { configurable: true, value: 600 },
+    });
+    fireEvent.scroll(directionAMobileScroller);
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__annotations article')[5]).toHaveClass('is-active');
+    expect(directionAChapter.querySelectorAll('.ff-direction-chapter__scroll-marker')).toHaveLength(0);
+    expect(screen.getByRole('img', { name: '宠物尺寸入口的破框构图与悬停状态', hidden: true })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/direction-a-pet-size-hover.jpg'
+    );
+    expect(screen.getByRole('img', { name: '方案 A 场景网格拓展状态', hidden: true })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: '空间场景中的商品热点与展开卡片', hidden: true })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/direction-a-space-exploration.png'
+    );
+    fireEvent.click(screen.getByRole('tab', { name: '方案 B' }));
+    expect(screen.getByRole('tab', { name: '方案 A' })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tab', { name: '方案 B' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('img', { name: '方案 B桌面端首页完整设计' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/direction-b-desktop.webp'
+    );
+    expect(screen.getByRole('region', { name: '滚动查看方案 B桌面端完整页面' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '滚动查看方案 B移动端完整页面' })).toBeInTheDocument();
+    expect(screen.getByText(/提高空间利用率、减少无效留白/)).toBeInTheDocument();
+    expect(screen.getByText(/不适合需要连续、深度阅读的文字型内容/)).toBeInTheDocument();
+    expect(screen.getAllByText('场景网格').length).toBeGreaterThan(0);
+    const strategySection = screen.getByRole('region', { name: '核心设计策略' });
+    expect(within(strategySection).getByRole('heading', { name: '核心设计策略' })).toHaveClass('case-section-heading__title');
+    expect(within(strategySection).getByRole('heading', { name: '保持双端路径一致' })).toBeInTheDocument();
+    expect(within(strategySection).getAllByRole('img')).toHaveLength(4);
+    expect(within(strategySection).getByRole('img', { name: '由沙发与家居形态组成的抽象生活场景' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/strategy-context.png'
+    );
+    expect(screen.getByRole('img', { name: 'FunnyFuzzy 商城首页最终移动端设计' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/final-mobile.webp'
+    );
+    expect(screen.getByText(/Variant\s+38\.46%/)).toBeInTheDocument();
+    expect(screen.getByText(/Variant\s+8\.65%/)).toBeInTheDocument();
+    expect(screen.getByText('$7.04 → $7.99')).toBeInTheDocument();
+    const extensionSection = screen.getByRole('region', { name: '后续系列页范围' });
+    expect(within(extensionSection).getByRole('tab', { name: 'Before' })).toHaveAttribute('aria-selected', 'true');
+    expect(within(extensionSection).getByRole('img', { name: 'FunnyFuzzy 类目页Before桌面端设计' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/category-before-desktop.jpg'
+    );
+    fireEvent.click(within(extensionSection).getByRole('tab', { name: 'After' }));
+    expect(within(extensionSection).getByRole('tab', { name: 'After' })).toHaveAttribute('aria-selected', 'true');
+    expect(within(extensionSection).getByRole('img', { name: 'FunnyFuzzy 类目页After移动端设计' })).toHaveAttribute(
+      'src',
+      '/assets/funnyfuzzy-homepage/category-after-mobile.jpg'
+    );
+    expect(screen.queryByText(/线上 A\/B 测试/)).not.toBeInTheDocument();
+    expect(screen.getByText(/探索两种不同的内容承接方式/)).toBeInTheDocument();
+    expect(document.querySelectorAll('.ff-directions__explorer > .ff-direction-chapter')).toHaveLength(1);
+
+    const fs = await import('node:fs');
+    expect(fs.readdirSync('public/assets/funnyfuzzy-homepage').sort()).toEqual([
+      'before-desktop.webp',
+      'before-mobile.webp',
+      'breathing-marker-static.png',
+      'breathing-marker.gif',
+      'category-after-desktop.jpg',
+      'category-after-mobile.jpg',
+      'category-before-desktop.jpg',
+      'category-before-mobile.jpg',
+      'cover.png',
+      'direction-a-desktop.webp',
+      'direction-a-grid-state-1.jpg',
+      'direction-a-grid-state-2.jpg',
+      'direction-a-mobile.webp',
+      'direction-a-pet-size-hover.jpg',
+      'direction-a-space-exploration.png',
+      'direction-b-desktop.webp',
+      'direction-b-mobile.webp',
+      'final-desktop.webp',
+      'final-mobile.webp',
+      'mood-immersion.webp',
+      'mood-softness.webp',
+      'mood-vitality.webp',
+      'strategy-context.png',
+      'strategy-responsive.png',
+      'strategy-rhythm.png',
+      'strategy-scale.png'
+    ]);
+  });
+
+  it('adds UOM as a Web case with evidence, system assets, and interactive planning', () => {
     const { unmount } = renderAt('/web');
 
     expect(screen.getByRole('link', { name: 'UOM' })).toHaveAttribute(
@@ -281,7 +591,14 @@ describe('portfolio routes', () => {
       '/project/web-uom'
     );
     expect(screen.getByRole('link', { name: 'UOM' })).toHaveClass('project-cover--uom');
+    const uomMeta = within(screen.getByLabelText('UOM 信息'));
+    expect(uomMeta.getByText('2024')).toBeInTheDocument();
+    expect(uomMeta.getByText('后台系统')).toBeInTheDocument();
     const uomCover = document.querySelector('.project-cover--uom .uom-cover');
+    expect(uomCover.querySelector('.uom-cover__visual')).toHaveAttribute(
+      'src',
+      '/assets/uom/uom-cover-visual.jpg'
+    );
     expect(uomCover.querySelector('.uom-cover__logo')).toHaveAttribute(
       'src',
       '/assets/uom/uom-vmall-portal.svg'
@@ -517,15 +834,15 @@ describe('portfolio routes', () => {
       'href',
       '/project/app-vmall-smart-service-2'
     );
-    expect(screen.getByText('APP客服系统')).toBeInTheDocument();
+    expect(screen.getByText('客服系统')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'VMALL 智能客服' })).toHaveAttribute(
       'src',
       '/assets/vmall-smart-service-2/logo.svg'
     );
-    expect(document.querySelectorAll('.vmall-smart-service-cover__flow')).toHaveLength(4);
+    expect(document.querySelector('.vmall-smart-service-cover__canvas')).toBeInTheDocument();
     expect(document.querySelector('.vmall-smart-service-cover__wave')).not.toBeInTheDocument();
     expect(document.querySelector('.project-cover--vmall-smart-service')).toHaveStyle({
-      '--cover-color': '#06346F'
+      '--cover-color': '#090827'
     });
 
     unmount();
@@ -752,18 +1069,18 @@ describe('portfolio routes', () => {
 
     expect(screen.queryByRole('link', { name: /HUAWEI CLOUD 站内外物料设计/i })).not.toBeInTheDocument();
     expect(portfolioSections.web.projects.find((project) => project.id === 'web-01')).toBeUndefined();
-    expect(screen.getByRole('link', { name: /HUAWEI CLOUD 产品页设计/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /华为云产品页设计/i })).toHaveAttribute(
       'href',
       '/project/web-huawei-cloud-product-pages'
     );
     expect(
       portfolioSections.web.projects.find((project) => project.id === 'web-huawei-cloud-product-pages').coverImage
     ).toBe('/assets/huawei-cloud/product-pages-cover.jpg');
-    expect(screen.getByRole('img', { name: /HUAWEI CLOUD 产品页设计封面/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /华为云产品页设计封面/i })).toHaveAttribute(
       'src',
       '/assets/huawei-cloud/product-pages-cover.jpg'
     );
-    expect(screen.getByRole('link', { name: /HUAWEI CLOUD 活动页设计/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /华为云活动页设计/i })).toHaveAttribute(
       'href',
       '/project/web-huawei-cloud-campaign-pages'
     );
@@ -773,11 +1090,11 @@ describe('portfolio routes', () => {
     expect(
       portfolioSections.web.projects.find((project) => project.id === 'web-huawei-cloud-campaign-pages').coverLogo
     ).toBe('/assets/huawei-cloud/campaign-cover-logo.svg');
-    expect(screen.getByRole('img', { name: /HUAWEI CLOUD 活动页设计封面$/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /华为云活动页设计封面$/i })).toHaveAttribute(
       'src',
       '/assets/huawei-cloud/campaign-pages-cover.jpg'
     );
-    expect(screen.getByRole('img', { name: /HUAWEI CLOUD 活动页设计封面标志/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /华为云活动页设计封面标志/i })).toHaveAttribute(
       'src',
       '/assets/huawei-cloud/campaign-cover-logo.svg'
     );
@@ -794,12 +1111,12 @@ describe('portfolio routes', () => {
     unmount();
     const productPage = renderAt('/project/web-huawei-cloud-product-pages');
 
-    expect(screen.queryByRole('heading', { name: 'HUAWEI CLOUD 产品页设计' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: '华为云产品页设计' })).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /为 HUAWEI CLOUD 官网产品页、解决方案页与多语言产品页面/i })
     ).toHaveClass('minimal-case__statement-title');
     expect(screen.getByRole('heading', { name: /保持层级、节奏与一致识别/i })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /HUAWEI CLOUD 产品页设计合集/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /华为云产品页设计合集/i })).toHaveAttribute(
       'src',
       '/assets/huawei-cloud/product-pages-collage.jpg'
     );
@@ -813,7 +1130,7 @@ describe('portfolio routes', () => {
       screen.getByRole('heading', { name: /为 HUAWEI CLOUD 活动页建立更具节奏感的视觉入口/i })
     ).toHaveClass('minimal-case__statement-title');
     expect(screen.getByRole('heading', { name: /在大促、发布会和专题活动之间/i })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /HUAWEI CLOUD 活动页设计合集/i })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: /华为云活动页设计合集/i })).toHaveAttribute(
       'src',
       '/assets/huawei-cloud/campaign-pages-collage.jpg'
     );
@@ -822,10 +1139,11 @@ describe('portfolio routes', () => {
   it('adds the Bujiaban smart material tool with an animated gradient cover and statement gallery detail', () => {
     const { unmount } = renderAt('/web');
 
-    expect(screen.getByRole('link', { name: '布家班-智能物料设计工具' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: '布家班' })).toHaveAttribute(
       'href',
       '/project/web-bujiaban-smart-material-tool'
     );
+    expect(screen.getByText('工具设计')).toBeInTheDocument();
     expect(document.querySelector('.project-cover--bujiaban')).toBeInTheDocument();
     expect(document.querySelector('.bujiaban-cover__logo')).toHaveAttribute(
       'src',
@@ -851,13 +1169,17 @@ describe('portfolio routes', () => {
 
     expect(screen.getByRole('heading', { name: /产品素材快速定位工具/i })).toBeInTheDocument();
     expect(screen.getByText(/为运营、设计、摄影团队设计的内部插件/i)).toBeInTheDocument();
-    expect(screen.getByText('类型')).toBeInTheDocument();
-    expect(screen.getByText('自主需求/协作工具')).toBeInTheDocument();
-    expect(screen.getByText('人数')).toBeInTheDocument();
-    expect(screen.getByText('1人')).toBeInTheDocument();
-    expect(screen.getByText('用户')).toBeInTheDocument();
-    expect(screen.getByText('产品、运营、设计、摄影')).toBeInTheDocument();
-    expect(screen.getByText('GitHub')).toBeInTheDocument();
+    const caseFacts = screen.getByLabelText('产品素材快速定位工具 项目概览');
+    expect(within(caseFacts).getAllByRole('term').map((term) => term.textContent)).toEqual([
+      '品牌',
+      '状态',
+      '角色',
+      '范围'
+    ]);
+    expect(within(caseFacts).getByText('个人项目')).toBeInTheDocument();
+    expect(within(caseFacts).getByText('已开源')).toBeInTheDocument();
+    expect(within(caseFacts).getByText('1人 / 产品、设计、开发')).toBeInTheDocument();
+    expect(within(caseFacts).getByText('产品、运营、设计、摄影')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'github.com/xiemingjian2024-stack/...' })).toHaveAttribute(
       'href',
       'https://github.com/xiemingjian2024-stack/funnyfuzzy-product-assets-extension'
@@ -865,6 +1187,39 @@ describe('portfolio routes', () => {
     expect(screen.getByText(/仅内部可见的插件/i)).toBeInTheDocument();
     expect(screen.getAllByText(/飞书绑定表/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/最终落到真实产品页/i)).toBeInTheDocument();
+  });
+
+  it('adds EDM Editor to AI projects and renders the full workflow case', () => {
+    const { unmount } = renderAt('/ai');
+
+    expect(screen.getByRole('link', { name: 'EDM Editor' })).toHaveAttribute(
+      'href',
+      '/project/ai-edm-editor'
+    );
+    expect(screen.getAllByText('AI 辅助工作流').length).toBeGreaterThan(0);
+    expect(document.querySelector('.project-cover--edm-editor')).toBeInTheDocument();
+    expect(screen.getByText(/2026 · AI 辅助工作流/i)).toBeInTheDocument();
+
+    unmount();
+    renderAt('/project/ai-edm-editor');
+
+    expect(screen.getByRole('heading', { name: 'EDM Editor' })).toBeInTheDocument();
+    const facts = screen.getByLabelText('EDM Editor 项目概览');
+    expect(within(facts).getByText('个人项目')).toBeInTheDocument();
+    expect(within(facts).getByText('已开源')).toBeInTheDocument();
+    expect(within(facts).getByText('产品、设计、开发')).toBeInTheDocument();
+    expect(within(facts).getByText('构思、交互、视觉、落地')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /楼层编排与属性编辑界面/i })).toHaveAttribute(
+      'src',
+      '/assets/edm-editor/editor.png'
+    );
+    expect(screen.getByRole('img', { name: /作品管理首页/i })).toHaveAttribute(
+      'src',
+      '/assets/edm-editor/home.png'
+    );
+    expect(screen.getByText('−58%')).toBeInTheDocument();
+    expect(screen.getByText(/试运行估算，用于展示衡量方式/i)).toBeInTheDocument();
+    expect(screen.getByText(/250 项自动测试/i)).toBeInTheDocument();
   });
 
   it('shows launch screenshots and extension UI states in the asset locator case', () => {
@@ -911,10 +1266,21 @@ describe('portfolio routes', () => {
     );
   });
 
-  it('uses a back action instead of category tabs inside project details', () => {
+  it('returns from project details to the matching project list', () => {
     renderAt('/project/app-funnfuzzy-icon-guide');
-    expect(screen.getByRole('button', { name: '返回' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'APP' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '返回' }));
+    expect(screen.getByRole('heading', { name: '移动产品与体验' })).toBeInTheDocument();
+
+    cleanup();
+    renderAt('/project/web-funnyfuzzy-homepage');
+    fireEvent.click(screen.getByRole('button', { name: '返回' }));
+    expect(screen.getByRole('heading', { name: '网页与品牌站' })).toBeInTheDocument();
+
+    cleanup();
+    renderAt('/project/ai-product-assets-locator');
+    fireEvent.click(screen.getByRole('button', { name: '返回' }));
+    expect(screen.getByRole('heading', { name: 'AI 项目与实验' })).toBeInTheDocument();
   });
 
   it('resets scroll position when a route renders', () => {

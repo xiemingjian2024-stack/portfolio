@@ -1,9 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ChevronDown, Instagram, Linkedin, Send } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BrainCircuit,
+  ChevronDown,
+  FolderDown,
+  FolderKanban,
+  FileImage,
+  Instagram,
+  Linkedin,
+  RefreshCcw,
+  ScanSearch,
+  Send,
+  Tags,
+} from 'lucide-react';
 import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
+  caseFactTokens,
   findProjectById,
   navItems,
   photographyItems,
@@ -11,7 +26,13 @@ import {
   profile
 } from './portfolioData.js';
 import { assetPath } from './assetPath.js';
+import { ArrowPathIcon } from './components/animated-icons/arrow-path.tsx';
+import { BookmarkIcon } from './components/animated-icons/bookmark.tsx';
+import { CursorArrowRaysIcon } from './components/animated-icons/cursor-arrow-rays.tsx';
+import { FolderArrowDownIcon } from './components/animated-icons/folder-arrow-down.tsx';
+import { SparklesIcon } from './components/animated-icons/sparkles.tsx';
 import './styles.css';
+import './funnyfuzzy-homepage.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -129,19 +150,16 @@ function BottomNavigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const isProjectDetail = location.pathname.startsWith('/project/');
+  const projectId = isProjectDetail ? decodeURIComponent(location.pathname.replace('/project/', '')) : '';
+  const project = projectId ? findProjectById(projectId) : null;
+  const projectListPath = project?.sectionKey ? `/${project.sectionKey}` : '/app';
 
   if (isProjectDetail) {
     return (
       <nav className="bottom-nav bottom-nav-back" aria-label="项目返回">
         <button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-              return;
-            }
-            navigate('/app');
-          }}
+          onClick={() => navigate(projectListPath)}
         >
           <ArrowLeft aria-hidden="true" />
           返回
@@ -189,7 +207,9 @@ function ProjectIndex({ sectionKey }) {
               style={{ '--cover-color': project.color }}
             >
               {project.coverVariant === 'asset-locator' && <AssetLocatorCover />}
+              {project.coverVariant === 'edm-editor' && <EdmEditorCover />}
               {project.coverVariant === 'app-icon-guide' && <AppIconGuideCover />}
+              {project.coverVariant === 'material-collector' && <MaterialCollectorCover />}
               {project.coverVariant === 'vmall-language-system' && <VmallLanguageCover />}
               {project.coverVariant === 'uom' && <UomCover project={project} />}
               {project.coverVariant === 'amazon-store' && <AmazonStoreCover />}
@@ -234,10 +254,7 @@ function BujiabanCover() {
 function VmallSmartServiceCover({ project }) {
   return (
     <div className="vmall-smart-service-cover">
-      <span className="vmall-smart-service-cover__flow vmall-smart-service-cover__flow--one" aria-hidden="true" />
-      <span className="vmall-smart-service-cover__flow vmall-smart-service-cover__flow--two" aria-hidden="true" />
-      <span className="vmall-smart-service-cover__flow vmall-smart-service-cover__flow--three" aria-hidden="true" />
-      <span className="vmall-smart-service-cover__flow vmall-smart-service-cover__flow--four" aria-hidden="true" />
+      <VmallServiceWaveCanvas />
       <img
         className="vmall-smart-service-cover__logo"
         src={project.coverLogo}
@@ -245,6 +262,117 @@ function VmallSmartServiceCover({ project }) {
       />
     </div>
   );
+}
+
+function VmallServiceWaveCanvas() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.navigator.userAgent.includes('jsdom')) return undefined;
+
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return undefined;
+
+    let frameId;
+    let width = 0;
+    let height = 0;
+    let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const resize = () => {
+      const bounds = canvas.getBoundingClientRect();
+      const density = Math.min(window.devicePixelRatio || 1, 2);
+      width = Math.max(1, bounds.width);
+      height = Math.max(1, bounds.height);
+      canvas.width = Math.round(width * density);
+      canvas.height = Math.round(height * density);
+      context.setTransform(density, 0, 0, density, 0, 0);
+    };
+
+    const waveY = (x, time, layer) => {
+      const position = x / width;
+      const envelope = 0.16 + 0.84 * Math.pow(Math.sin(Math.PI * position), 1.7);
+      const pulse = 0.82 + 0.18 * Math.sin(time * 0.46 + layer * 1.17);
+      const primary = Math.sin(position * Math.PI * (2.25 + layer * 0.13) - time * (0.68 + layer * 0.035) + layer * 0.92);
+      const secondary = Math.sin(position * Math.PI * (5.1 - layer * 0.11) + time * (0.38 + layer * 0.025) - layer * 0.47);
+      const detail = Math.sin(position * Math.PI * 8.4 - time * 0.22 + layer * 1.31);
+      const amplitude = height * (0.066 + layer * 0.005) * envelope * pulse;
+      return height * 0.69 + amplitude * (primary * 0.7 + secondary * 0.23 + detail * 0.07);
+    };
+
+    const traceWave = (time, layer, offset = 0) => {
+      context.beginPath();
+      for (let x = -2; x <= width + 2; x += 2) {
+        const y = waveY(x, time, layer) + offset;
+        if (x === -2) context.moveTo(x, y);
+        else context.lineTo(x, y);
+      }
+    };
+
+    const render = (timestamp = 0) => {
+      const time = reducedMotion ? 2.4 : timestamp * 0.001;
+      context.clearRect(0, 0, width, height);
+      context.globalCompositeOperation = 'lighter';
+
+      for (let layer = 0; layer < 6; layer += 1) {
+        const ribbon = context.createLinearGradient(0, 0, width, 0);
+        ribbon.addColorStop(0, 'rgba(55, 62, 255, 0)');
+        ribbon.addColorStop(0.2, `rgba(67, 74, 255, ${0.035 + layer * 0.006})`);
+        ribbon.addColorStop(0.54, `rgba(99, 102, 255, ${0.08 + layer * 0.008})`);
+        ribbon.addColorStop(0.82, `rgba(71, 69, 255, ${0.05 + layer * 0.006})`);
+        ribbon.addColorStop(1, 'rgba(55, 62, 255, 0)');
+
+        traceWave(time, layer, -height * (0.01 + layer * 0.002));
+        for (let x = width + 2; x >= -2; x -= 2) {
+          context.lineTo(x, waveY(x, time + 0.34 + layer * 0.035, layer) + height * (0.01 + layer * 0.002));
+        }
+        context.closePath();
+        context.fillStyle = ribbon;
+        context.fill();
+
+        const stroke = context.createLinearGradient(0, 0, width, 0);
+        stroke.addColorStop(0, 'rgba(80, 90, 255, 0)');
+        stroke.addColorStop(0.18, 'rgba(76, 91, 255, 0.35)');
+        stroke.addColorStop(0.52, `rgba(178, 194, 255, ${0.42 + layer * 0.055})`);
+        stroke.addColorStop(0.84, 'rgba(88, 88, 255, 0.42)');
+        stroke.addColorStop(1, 'rgba(80, 90, 255, 0)');
+        traceWave(time, layer);
+        context.strokeStyle = stroke;
+        context.lineWidth = layer === 2 ? 1.45 : 0.8;
+        context.shadowColor = 'rgba(73, 83, 255, 0.8)';
+        context.shadowBlur = layer === 2 ? 14 : 8;
+        context.stroke();
+      }
+
+      context.shadowBlur = 0;
+      context.globalCompositeOperation = 'source-over';
+      if (!reducedMotion) frameId = window.requestAnimationFrame(render);
+    };
+
+    const onMotionChange = (event) => {
+      reducedMotion = event.matches;
+      window.cancelAnimationFrame(frameId);
+      render(performance.now());
+    };
+
+    resize();
+    render(performance.now());
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      if (reducedMotion) render(performance.now());
+    });
+    resizeObserver.observe(canvas);
+    motionQuery.addEventListener('change', onMotionChange);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      motionQuery.removeEventListener('change', onMotionChange);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="vmall-smart-service-cover__canvas" aria-hidden="true" />;
 }
 
 function VmallPolarisCover({ project }) {
@@ -333,6 +461,26 @@ function ProjectDetail() {
 function CaseStudyDetail({ project }) {
   useSharedCaseMotion(project.id);
 
+  if (project.caseStudy.template === 'funnyfuzzy-homepage') {
+    return <FunnyFuzzyHomepageDetail project={project} />;
+  }
+
+  if (project.caseStudy.template === 'material-collector') {
+    return <MaterialCollectorDetail project={project} />;
+  }
+
+  if (project.caseStudy.template === 'edm-editor') {
+    return <EdmEditorDetail project={project} />;
+  }
+
+  if (project.caseStudy.template === 'project-scaffold') {
+    return (
+      <article className="case-study case-study--scaffold">
+        <CaseHero project={project} />
+      </article>
+    );
+  }
+
   if (project.caseStudy.template === 'statement-gallery') {
     return <StatementGalleryDetail project={project} />;
   }
@@ -388,15 +536,38 @@ function CaseStudyDetail({ project }) {
   );
 }
 
+const CASE_FACT_LABEL_ALIASES = {
+  brand: ['品牌', '类型'],
+  status: ['状态', '平台', '人数', 'GitHub'],
+  role: ['角色', '用户'],
+  scope: ['范围', '场景', '产出']
+};
+
+function normalizeCaseFacts(project) {
+  const sourceFacts = project.caseStudy.facts || [
+    { key: 'brand', value: project.title },
+    { key: 'status', value: project.caseStudy.status || '进行中' },
+    { key: 'role', value: project.caseStudy.role || project.caseStudy.users },
+    { key: 'scope', value: project.caseStudy.scope || project.caseStudy.output || project.caseStudy.scene }
+  ];
+
+  return caseFactTokens.map((token) => {
+    const aliases = CASE_FACT_LABEL_ALIASES[token.key] || [];
+    const matchingFact = sourceFacts.find(
+      (fact) => fact.key === token.key || fact.label === token.label || aliases.includes(fact.label)
+    );
+
+    return {
+      ...matchingFact,
+      key: token.key,
+      label: token.label,
+      value: matchingFact?.value || '—'
+    };
+  });
+}
+
 function CaseHero({ project, showFacts = true }) {
-  const facts =
-    project.caseStudy.facts ||
-    [
-      { label: '角色', value: project.caseStudy.role },
-      { label: '用户', value: project.caseStudy.users },
-      { label: '场景', value: project.caseStudy.scene },
-      { label: '产出', value: project.caseStudy.output },
-    ];
+  const facts = normalizeCaseFacts(project);
 
   return (
     <>
@@ -404,7 +575,7 @@ function CaseHero({ project, showFacts = true }) {
         <div className="case-hero-grid">
           <div className="case-hero-copy">
             <h1>{project.title}</h1>
-            <p>{project.caseStudy.intro}</p>
+            {project.caseStudy.intro && <p>{project.caseStudy.intro}</p>}
           </div>
           <CaseHeroCover project={project} />
         </div>
@@ -413,7 +584,7 @@ function CaseHero({ project, showFacts = true }) {
       {showFacts && (
         <dl className="case-facts" aria-label={`${project.title} 项目概览`}>
           {facts.map((fact) => (
-            <div key={fact.label}>
+            <div key={fact.key}>
               <dt>{fact.label}</dt>
               <dd className={fact.linkLabel ? 'case-fact__linked-value' : undefined}>
                 {fact.href && fact.linkLabel ? (
@@ -440,12 +611,16 @@ function CaseHero({ project, showFacts = true }) {
 }
 
 function CaseHeroCover({ project }) {
-  const className = `detail-cover detail-cover--${project.coverVariant || 'default'}`;
+  const className = `detail-cover detail-cover--${project.coverVariant || 'default'} ${
+    project.coverPlaceholder ? 'detail-cover--placeholder' : ''
+  }`;
 
   return (
     <div className={className} style={{ '--cover-color': project.color }}>
       {project.coverVariant === 'asset-locator' && <AssetLocatorCover />}
+      {project.coverVariant === 'edm-editor' && <EdmEditorCover />}
       {project.coverVariant === 'app-icon-guide' && <AppIconGuideCover />}
+      {project.coverVariant === 'material-collector' && <MaterialCollectorCover />}
       {project.coverVariant === 'vmall-language-system' && <VmallLanguageCover detail />}
       {project.coverVariant === 'uom' && <UomCover project={project} detail />}
       {project.coverVariant === 'amazon-store' && <AmazonStoreCover detail />}
@@ -454,6 +629,557 @@ function CaseHeroCover({ project }) {
         <img className="project-cover__image" src={project.coverImage} alt={project.coverImageAlt} />
       )}
     </div>
+  );
+}
+
+function MaterialCollectorCover() {
+  return (
+    <div className="material-collector-cover">
+      <img
+        className="material-collector-cover__background"
+        src={assetPath('/assets/material-collector/cover-grid-background.png')}
+        alt=""
+        aria-hidden="true"
+      />
+      <img
+        className="material-collector-cover__logo"
+        src={assetPath('/assets/material-collector/cangshu-cover-icon.svg')}
+        alt="谢小屯应用 Logo"
+      />
+    </div>
+  );
+}
+
+function EdmEditorCover() {
+  return (
+    <div className="edm-editor-cover">
+      <div className="edm-editor-cover__copy">
+        <span>2026 · AI 辅助工作流</span>
+        <strong>EDM<br />Editor</strong>
+      </div>
+      <div className="edm-editor-cover__window" aria-hidden="true">
+        <img src={assetPath('/assets/edm-editor/editor.png')} alt="" />
+      </div>
+      <div className="edm-editor-cover__badge" aria-hidden="true">
+        <i />
+        <span>BUILD<br />EXPORT</span>
+      </div>
+    </div>
+  );
+}
+
+const MATERIAL_COLLECTOR_FLOW_ICONS = [CursorArrowRaysIcon, FolderArrowDownIcon, SparklesIcon, BookmarkIcon, ArrowPathIcon];
+const MATERIAL_COLLECTOR_ADVANTAGE_MARK_ORDER = [1, 3, 2, 4];
+const MATERIAL_COLLECTOR_EXTENSION_ICONS = [FolderDown, RefreshCcw, Tags, FolderKanban];
+const MATERIAL_COLLECTOR_CLASSIFICATION_INPUT_ICONS = [FileImage, ScanSearch, RefreshCcw];
+const MATERIAL_COLLECTOR_FLOW_ROLE_LABELS = {
+  human: '我参与',
+  model: '本地模型',
+  system: '自动执行',
+};
+
+function MaterialCollectorHeading({ title, body }) {
+  return (
+    <div className="case-section-heading material-collector-heading material-collector-reveal">
+      <h2 className="case-section-heading__title">{title}</h2>
+      {body && <h3>{body}</h3>}
+    </div>
+  );
+}
+
+function MaterialCollectorFlowCard({ step, flowIndex, flowLength }) {
+  const [index, title, body, role, roleLabel] = step;
+  const Icon = MATERIAL_COLLECTOR_FLOW_ICONS[flowIndex];
+  const iconRef = useRef(null);
+  const direction = flowIndex < flowLength - 1 ? 'right' : 'none';
+
+  return (
+    <li
+      className={`is-${role}${index === '04' ? ' is-reference' : ''}`}
+      data-flow-step={index}
+      onPointerEnter={() => iconRef.current?.startAnimation()}
+      onPointerLeave={() => iconRef.current?.stopAnimation()}
+    >
+      <div className="material-collector-flow__meta">
+        <span>{index}</span>
+        <span>{roleLabel || MATERIAL_COLLECTOR_FLOW_ROLE_LABELS[role]}</span>
+      </div>
+      <Icon ref={iconRef} className="material-collector-flow__icon" size={30} aria-hidden="true" />
+      <div className="material-collector-flow__copy">
+        <h3>{title}</h3>
+        <p>{body}</p>
+      </div>
+      {direction !== 'none' && (
+        <span
+          className={`material-collector-flow__connector is-${direction}`}
+          style={{ '--flow-delay': `${flowIndex * -0.34}s` }}
+          aria-hidden="true"
+        >
+          <ArrowRight />
+        </span>
+      )}
+    </li>
+  );
+}
+
+function MaterialCollectorFlowDiagram({ flow }) {
+  return (
+    <div className="material-collector-flow-diagram material-collector-reveal">
+      <ol className="material-collector-flow" aria-label="采集到偏好学习的五步闭环">
+        {flow.map((step, flowIndex) => (
+          <MaterialCollectorFlowCard key={step[0]} step={step} flowIndex={flowIndex} flowLength={flow.length} />
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function MaterialCollectorAdvantageCard({ advantage, index }) {
+  const [title, body] = advantage;
+  const markNumber = MATERIAL_COLLECTOR_ADVANTAGE_MARK_ORDER[index];
+
+  return (
+    <article>
+      <span className="material-collector-advantages__icon" aria-hidden="true">
+        <img src={assetPath(`/assets/material-collector/advantage-mark-${markNumber}.png`)} alt="" />
+      </span>
+      <div>
+        <h4>{title}</h4>
+        <p>{body}</p>
+      </div>
+    </article>
+  );
+}
+
+function MaterialCollectorClassificationLogic({ classification }) {
+  return (
+    <div className="material-collector-classification-board material-collector-reveal">
+      <header className="material-collector-classification-board__header">
+        <div>
+          <h3>{classification.model}</h3>
+        </div>
+        <p>{classification.runtime}</p>
+      </header>
+
+      <div className="material-collector-classification-tree" aria-label="本地模型标签判断树">
+        <div className="material-collector-classification-tree__inputs" aria-label="分类输入信号">
+          {classification.inputs.map(([, title, body], index) => {
+            const Icon = MATERIAL_COLLECTOR_CLASSIFICATION_INPUT_ICONS[index];
+            return (
+              <article className="material-collector-classification-tree__node is-input" key={title}>
+                <div><Icon aria-hidden="true" /><h4>{title}</h4></div>
+                <p>{body}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="material-collector-classification-tree__flow" aria-hidden="true"><ArrowRight /></div>
+
+        <article className="material-collector-classification-tree__node is-gate">
+          <div>
+            <h4>先判断唯一主类型</h4>
+            <p>宣传视觉即使使用三维模型，也优先按成品用途判断；只有 UI 置信度达到门槛，才进入界面标签分支。</p>
+          </div>
+          <ul>{classification.assetTypes.map((type) => <li key={type}>{type}</li>)}</ul>
+        </article>
+
+        <div className="material-collector-classification-tree__split" aria-hidden="true"><span /></div>
+
+        <div className="material-collector-classification-tree__branches" aria-label="标签判断分支">
+          {classification.branches.map(([, title, rule, tags], index) => (
+            <article className={`material-collector-classification-tree__node ${index === 0 ? 'is-ui' : 'is-general'}`} key={title}>
+              <header><strong>{rule}</strong></header>
+              <h4>{title}</h4>
+              <ul>{tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
+            </article>
+          ))}
+        </div>
+
+        <div className="material-collector-classification-tree__join" aria-hidden="true"><span /></div>
+
+        <section className="material-collector-classification-tree__validation" aria-label="标签校验规则">
+          <header><Tags aria-hidden="true" /><h4>校验候选标签</h4></header>
+          <div>
+            <article><strong>置信度门槛</strong><span>不同维度使用 0.66–0.80 的阈值</span></article>
+            <article><strong>词表与上限</strong><span>只保留允许的标签，并限制每个维度数量</span></article>
+            <article><strong>偏好重排</strong><span>常用标签优先，被删除标签需要更强证据</span></article>
+          </div>
+        </section>
+
+        <div className="material-collector-classification-tree__flow" aria-hidden="true"><ArrowRight /></div>
+
+        <section className="material-collector-classification-tree__output">
+          <header><h4>合并结果，但不覆盖人的判断</h4></header>
+          <ol>
+            {classification.merge.map(([label, body], index) => (
+              <li className={index >= 2 ? 'is-human' : ''} key={label}>
+                <strong>{label}</strong>
+                <p>{body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function MaterialCollectorCaptureDemo() {
+  const [collected, setCollected] = useState(false);
+
+  return (
+    <div className="material-collector-capture-demo material-collector-reveal">
+      <div className="material-collector-capture-demo__browser">
+        <div className="material-collector-capture-demo__bar" aria-hidden="true">
+          <span className="material-collector-capture-demo__dots"><i /><i /><i /></span>
+          <span>behance.net/search/projects</span>
+          <span>•••</span>
+        </div>
+        <div className="material-collector-capture-demo__media">
+          <img
+            className="material-collector-capture-demo__material"
+            src={assetPath('/assets/material-collector/behance-list-page-latest.png')}
+            alt="Behance 移动端界面设计作品列表页"
+          />
+          <span className="material-collector-capture-demo__state">采集状态 · 悬停后</span>
+          <button
+            className={`material-collector-capture-demo__button${collected ? ' is-collected' : ''}`}
+            type="button"
+            aria-label="采集素材"
+            aria-pressed={collected}
+            title="采集素材"
+            onClick={() => setCollected(true)}
+          >
+            <img src={assetPath('/assets/material-collector/collect-icon.png')} alt="" />
+          </button>
+          <span className={`material-collector-capture-demo__toast${collected ? ' is-visible' : ''}`} role="status">
+            已存入素材库
+          </span>
+        </div>
+      </div>
+
+      <aside className="material-collector-capture-demo__notes" aria-label="采集按钮交互说明">
+        <article>
+          <span>01 / HOVER</span>
+          <h3>只在需要时出现</h3>
+          <p>鼠标进入素材范围，采集入口才浮现在图片左上角，浏览页面时保持安静。</p>
+        </article>
+        <article>
+          <span>02 / ACTION</span>
+          <div className="material-collector-capture-demo__specimen" aria-hidden="true">
+            <span><img src={assetPath('/assets/material-collector/collect-icon.png')} alt="" /></span>
+            <small>44 × 44 px</small>
+          </div>
+          <h3>一个图标完成采集</h3>
+          <p>使用仓鼠吞下图片的品牌动作；点击左侧按钮可查看成功反馈。</p>
+        </article>
+        <article>
+          <span>03 / SOURCE</span>
+          <div className="material-collector-capture-demo__quality" aria-hidden="true">
+            <small>列表缩略图</small><ArrowRight /><strong>原始大图</strong>
+          </div>
+          <h3>列表页直取原始大图</h3>
+          <p>在 Behance 等素材网站中直接解析卡片对应的大图地址，保留素材质量，也省去逐一进入详情页的步骤。</p>
+        </article>
+      </aside>
+    </div>
+  );
+}
+
+function MaterialCollectorDetail({ project }) {
+  const { background, benchmark, classification, flow, principle } = project.caseStudy;
+
+  return (
+    <article className="case-study material-collector-case">
+      <CaseHero project={project} />
+
+      <section className="case-visual-section material-collector-statement material-collector-reveal" aria-label="项目核心思路">
+        <div className="case-section-heading case-section-heading--statement">
+          <h2 className="case-section-heading__title">{principle}</h2>
+        </div>
+      </section>
+
+      <section className="case-visual-section material-collector-background" aria-label="项目背景">
+        <MaterialCollectorHeading title={background.title} body={background.body} />
+        <div className="material-collector-pains material-collector-reveal">
+          {background.pains.map(([title, body], index) => (
+            <article key={title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="case-visual-section material-collector-system" aria-label="项目方案">
+        <MaterialCollectorHeading
+          title="让采集器与素材库成为一条连续链路"
+          body="我负责触发采集、纠正标签与再次使用；系统负责保存原文件；本地模型只负责理解素材与学习偏好。AI 不替我做最终判断，而是把每次纠正变成下一次判断的上下文。"
+        />
+        <MaterialCollectorFlowDiagram flow={flow} />
+      </section>
+
+      <section className="case-visual-section material-collector-benchmark" aria-label="花瓣采集器竞品分析">
+        <MaterialCollectorHeading
+          title={benchmark.title}
+          body={benchmark.body}
+        />
+        <div className="material-collector-comparison material-collector-reveal" role="table" aria-label="花瓣与谢小屯能力对比">
+          <div className="material-collector-comparison__header" role="row">
+            <span role="columnheader">对比维度</span>
+            <span className="material-collector-comparison__brand" role="columnheader">
+              <img src={assetPath('/assets/material-collector/huaban-mark.png')} alt="" />
+              花瓣采集器
+            </span>
+            <span className="material-collector-comparison__brand" role="columnheader">
+              <img src={assetPath('/assets/material-collector/cangshu-app-icon-macos.svg')} alt="" />
+              谢小屯
+            </span>
+          </div>
+          {benchmark.rows.map((row) => (
+            <div className="material-collector-comparison__row" role="row" key={row.dimension}>
+              <strong role="rowheader">{row.dimension}</strong>
+              <p className={row.winner === 'huaban' ? 'is-stronger' : ''} role="cell">
+                {row.huaban}
+                {(row.huabanBadge || row.winner === 'huaban') && <span>{row.huabanBadge || '更完整'}</span>}
+              </p>
+              <p className={row.winner === 'materialCollector' ? 'is-stronger' : ''} role="cell">
+                {row.materialCollector}
+                {(row.materialCollectorBadge || row.winner === 'materialCollector') && (
+                  <span>{row.materialCollectorBadge || '更适合个人工作流'}</span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="material-collector-advantages material-collector-reveal">
+          <div className="material-collector-advantages__grid">
+            {benchmark.advantages.map((advantage, index) => (
+              <MaterialCollectorAdvantageCard key={advantage[0]} advantage={advantage} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="case-visual-section material-collector-capture" aria-label="网页采集设计过程">
+        <MaterialCollectorHeading
+          title="把保存动作压缩到素材本身"
+          body="鼠标悬停图片后，左上角才出现圆形仓鼠采集按钮；不复制地址、不切换窗口，一次点击直接存入本地素材库。在 Behance 等列表页中，扩展会定位卡片对应的原始大图而非保存缩略图，既保证素材质量，也省去逐一进入详情页的步骤。"
+        />
+        <MaterialCollectorCaptureDemo />
+      </section>
+
+      <section className="case-visual-section material-collector-classification" aria-label="本地模型分类逻辑">
+        <div className="material-collector-classification__copy">
+          <MaterialCollectorHeading
+            title="制定标签逻辑"
+            body="先判断素材是什么，再决定该用哪些标签。分类不是一次模型调用，而是一条本地管线：系统先提取文件与视觉线索，模型完成主类型和语义判断，再用置信度、白名单与个人偏好校验结果。人工新增和删除始终拥有最高优先级。"
+          />
+        </div>
+        <div className="material-collector-classification__content">
+          <MaterialCollectorClassificationLogic classification={classification} />
+        </div>
+      </section>
+
+      <section className="case-visual-section material-collector-library" aria-label="本地素材库设计过程">
+        <MaterialCollectorHeading
+          title="用素材本身建立浏览秩序"
+          body="桌面端以瀑布流承接不同尺寸的图片和视频，搜索、类型筛选与原文件入口保持克制，让视觉内容成为界面的主要信息。"
+        />
+        <figure className="material-collector-screen material-collector-reveal">
+          <img src={assetPath('/assets/material-collector/library-home-labeled.png')} alt="谢小屯本地素材库瀑布流首页" />
+        </figure>
+      </section>
+
+      <section className="case-visual-section material-collector-learning" aria-label="标签学习设计过程">
+        <div className="material-collector-learning__copy">
+          <MaterialCollectorHeading
+            title="让人工判断始终高于自动判断"
+            body="AI 先给出内容和用途标签，用户可以直接增删；系统分别记录补充与否定，而不是用新分析覆盖手动选择。颜色、比例、格式仍留在后台，为后续筛选提供结构化信息。"
+          />
+          <div className="material-collector-learning__loop material-collector-reveal" aria-label="偏好学习循环">
+            <span><BrainCircuit aria-hidden="true" />AI 初始标签</span>
+            <ArrowRight aria-hidden="true" />
+            <span><Tags aria-hidden="true" />人工纠正</span>
+            <ArrowRight aria-hidden="true" />
+            <span><RefreshCcw aria-hidden="true" />偏好档案</span>
+          </div>
+        </div>
+        <figure className="material-collector-screen material-collector-screen--detail material-collector-reveal">
+          <img src={assetPath('/assets/material-collector/library-detail-latest.png')} alt="谢小屯素材详情与标签修正界面" />
+        </figure>
+      </section>
+
+      <section className="case-visual-section material-collector-collaboration" aria-label="协作与同步可扩展路线">
+        <MaterialCollectorHeading
+          title="从本地优先出发，逐步长出协作能力"
+          body="不先搭建新的云端平台，而是围绕“文件可迁移、设备可同步、团队语言可共享”逐层扩展；个人偏好仍然保留在本地。"
+        />
+        <div className="material-collector-roadmap material-collector-reveal">
+          <div className="material-collector-roadmap__grid">
+            {benchmark.extensions.map(([stage, title, body], index) => {
+              const Icon = MATERIAL_COLLECTOR_EXTENSION_ICONS[index];
+              return (
+                <article key={title}>
+                  <div><span>{stage}</span><Icon aria-hidden="true" /></div>
+                  <h4>{title}</h4>
+                  <p>{body}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+    </article>
+  );
+}
+
+function EdmEditorDetail({ project }) {
+  const { background, capabilities, decisions, results, statement } = project.caseStudy;
+  const facts = normalizeCaseFacts(project);
+
+  return (
+    <article className="case-study edm-case">
+        <section className="edm-landing-hero" aria-label="EDM Editor 项目首屏">
+        <div className="edm-landing-hero__copy edm-reveal">
+          <span>2026 · AI ASSISTED WORKFLOW</span>
+          <h1>EDM Editor</h1>
+          <p>{project.caseStudy.intro}</p>
+          <strong>个人项目 · 已开源</strong>
+        </div>
+        <figure className="edm-landing-hero__visual edm-reveal">
+          <img src={assetPath('/assets/edm-editor/editor.png')} alt="EDM Editor 楼层编排与属性编辑界面" />
+        </figure>
+        <dl className="edm-landing-facts" aria-label={`${project.title} 项目概览`}>
+          {facts.map((fact) => (
+            <div key={fact.key}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
+          ))}
+        </dl>
+      </section>
+
+      <section className="edm-landing-section edm-background" aria-label="项目背景">
+        <div className="edm-landing-heading edm-landing-heading--center edm-reveal">
+          <span>01 · PROJECT CONTEXT</span>
+          <h2>{background.title}</h2>
+          <p>{background.body}</p>
+        </div>
+        <div className="edm-context-grid edm-reveal">
+          {background.pains.map(([title, body], index) => (
+            <article className={`edm-context-card edm-context-card--${index + 1}`} key={title}>
+              <span>0{index + 1}</span>
+              <div><h3>{title}</h3><p>{body}</p></div>
+            </article>
+          ))}
+          <article className="edm-context-card edm-context-card--statement">
+            <span>WHY</span>
+            <div><h3>颜色可编辑，设计提供建议</h3><p>{statement}</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section className="edm-landing-section edm-product" aria-label="产品方案">
+        <div className="edm-landing-heading edm-reveal">
+          <span>02 · PRODUCT STRATEGY</span>
+          <h2>把设计稿变成一套可以持续生长的生产系统</h2>
+          <p>不是把 Figma 搬进浏览器，而是把设计师反复做出的判断拆成模板、属性、数据与导出规则。</p>
+        </div>
+        <div className="edm-feature-stack">
+          {decisions.slice(0, 3).map(([eyebrow, title, body], index) => {
+            const images = ['/assets/edm-editor/editor.png', '/assets/edm-editor/home.png', '/assets/edm-editor/preview.png'];
+            const alts = ['楼层模板、实时画布与属性面板', 'EDM 与 GIF 作品资产列表', '完整预览与导出检查'];
+            return (
+              <article className={`edm-feature-row ${index % 2 ? 'is-reversed' : ''} edm-reveal`} key={title}>
+                <figure><img src={assetPath(images[index])} alt={alts[index]} /></figure>
+                <div><span>{eyebrow}</span><h3>{title}</h3><p>{body}</p></div>
+              </article>
+            );
+          })}
+          <article className="edm-feature-row edm-feature-row--compact is-reversed edm-reveal">
+            <div className="edm-export-card">
+              <strong>2×</strong><span>高清切图</span>
+              <strong>GIF</strong><span>动态导出</span>
+              <strong>URL</strong><span>可点击热区</span>
+            </div>
+            <div><span>{decisions[3][0]}</span><h3>{decisions[3][1]}</h3><p>{decisions[3][2]}</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section className="edm-landing-section edm-workflow" aria-label="核心工作流">
+        <div className="edm-landing-heading edm-landing-heading--center edm-reveal">
+          <span>03 · CORE WORKFLOW</span>
+          <h2>从作品管理到导出检查，保持一条清晰路径</h2>
+          <p>运营可以快速开始，设计师仍能通过模板边界控制品牌一致性。</p>
+        </div>
+        <figure className="edm-workflow-showcase edm-reveal">
+          <img src={assetPath('/assets/edm-editor/home.png')} alt="EDM Editor 作品管理首页" />
+          <figcaption>
+            <article><span>01</span><h3>创建与复用</h3><p>EDM 与 GIF 分开管理，本地自动保存，支持设计稿收发。</p></article>
+            <article><span>02</span><h3>在规范内编辑</h3><p>运营自行调整文字、价格与颜色，版式和品牌边界仍由模板约束。</p></article>
+            <article><span>03</span><h3>预览与导出</h3><p>导出前集中检查图片、链接和尺寸，减少返工与遗漏。</p></article>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section className="edm-landing-section edm-build" aria-label="AI 协作设计过程">
+        <div className="edm-landing-heading edm-reveal">
+          <span>04 · AI COLLABORATION</span>
+          <h2>AI 加快实现，产品边界与设计质量仍由我负责</h2>
+          <p>我把 Codex 当作可以协作落地的工程伙伴，再用真实界面、导出文件与团队反馈持续校准结果。</p>
+        </div>
+        <figure className="edm-build__visual edm-reveal">
+          <img src={assetPath('/assets/edm-editor/preview.png')} alt="EDM Editor 完整预览与问题检查界面" />
+        </figure>
+        <div className="edm-build__steps edm-reveal">
+          {[
+            ['定义边界', '明确哪些版式规则必须锁定，哪些文字、价格与颜色应该交给运营。'],
+            ['协作实现', '建立 React / TypeScript 编辑器、模板注册机制与本地服务。'],
+            ['真实校准', '逐项检查交互、图片裁切、GIF 帧、半像素接缝和导出尺寸。'],
+            ['跨端交付', '完成 macOS 与 Windows 桌面包、版本管理、测试和维护说明。']
+          ].map(([title, body], index) => (
+            <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p></article>
+          ))}
+        </div>
+      </section>
+
+      <section className="edm-landing-section edm-capabilities" aria-label="实现能力">
+        <div className="edm-landing-heading edm-landing-heading--center edm-reveal">
+          <span>05 · BUILD CAPABILITIES</span>
+          <h2>从交互原型走到可安装、可维护、可验证的真实工具</h2>
+          <p>模板、数据、导出和桌面端形成同一套可扩展基础。</p>
+        </div>
+        <div className="edm-capability-grid edm-reveal">
+          {capabilities.map(([title, body], index) => (
+            <article key={title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="edm-landing-section edm-results" aria-label="项目数据结果">
+        <div className="edm-landing-heading edm-landing-heading--center edm-reveal">
+          <span>06 · OUTCOME</span>
+          <h2>把一次次设计交付，转为运营可以自己完成的标准工作流</h2>
+          <p>以下为当前试运行估算，用于展示衡量方式，后续将用真实需求单持续校准。</p>
+        </div>
+        <div className="edm-result-grid edm-reveal">
+          {results.map(([value, label, note]) => (
+            <article key={label}><strong>{value}</strong><h3>{label}</h3><p>{note}</p></article>
+          ))}
+        </div>
+      </section>
+
+      <section className="edm-landing-ending edm-reveal" aria-label="项目总结">
+        <span>EDM EDITOR · 2026</span><h2>让模板承接重复，<br />让设计继续解决新的问题。</h2>
+        <p>个人项目 · 产品、设计、开发</p>
+      </section>
+    </article>
   );
 }
 
@@ -488,6 +1214,9 @@ function useSharedCaseMotion(projectId) {
         ...gsap.utils.toArray('.case-section-heading'),
         ...gsap.utils.toArray('.uom-reveal'),
         ...gsap.utils.toArray('.ideal-vmall-reveal'),
+        ...gsap.utils.toArray('.ff-home-reveal'),
+        ...gsap.utils.toArray('.material-collector-reveal'),
+        ...gsap.utils.toArray('.edm-reveal'),
       ]));
 
       revealTargets.forEach((target) => {
@@ -507,6 +1236,52 @@ function useSharedCaseMotion(projectId) {
           }
         );
       });
+
+      const materialFlow = scope.querySelector('.material-collector-flow');
+      if (materialFlow) {
+        const materialFlowSteps = gsap.utils.toArray(':scope > li', materialFlow);
+        gsap.fromTo(
+          materialFlowSteps,
+          { autoAlpha: 0, y: 28, scale: 0.985 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.72,
+            ease: CASE_MOTION.ease,
+            stagger: 0.1,
+            scrollTrigger: {
+              trigger: materialFlow,
+              start: 'top 82%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      const classificationBoard = scope.querySelector('.material-collector-classification-board');
+      if (classificationBoard) {
+        const classificationParts = gsap.utils.toArray(
+          '.material-collector-classification-tree__node.is-input, .material-collector-classification-tree__node.is-gate, .material-collector-classification-tree__branches > article, .material-collector-classification-tree__validation, .material-collector-classification-tree__output li',
+          classificationBoard
+        );
+        gsap.fromTo(
+          classificationParts,
+          { autoAlpha: 0, y: 24 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.68,
+            ease: CASE_MOTION.ease,
+            stagger: 0.065,
+            scrollTrigger: {
+              trigger: classificationBoard,
+              start: 'top 82%',
+              once: true,
+            },
+          }
+        );
+      }
 
       const amazonRevealGroups = [
         ['.amazon-market__stats', ':scope > a'],
@@ -632,6 +1407,12 @@ function UomCover({ project, detail = false }) {
       aria-label={project.coverImageAlt}
       role="img"
     >
+      <img
+        className="uom-cover__visual"
+        src={assetPath('/assets/uom/uom-cover-visual.jpg')}
+        alt=""
+        aria-hidden="true"
+      />
       <img className="uom-cover__logo" src={assetPath('/assets/uom/uom-vmall-portal.svg')} alt="" aria-hidden="true" />
     </div>
   );
@@ -690,12 +1471,587 @@ const AMAZON_RESEARCH = [
   }
 ];
 
-function AmazonSectionHeading({ title, body }) {
+function AmazonSectionHeading({ title, body, className = '' }) {
   return (
-    <div className="case-section-heading amazon-case__heading">
+    <div className={`case-section-heading amazon-case__heading ${className}`.trim()}>
       <h2 className="case-section-heading__title">{title}</h2>
       {body && <h3>{body}</h3>}
     </div>
+  );
+}
+
+function FunnyFuzzySectionHeading({ index, title, body }) {
+  return (
+    <div className="case-section-heading ff-home-heading ff-home-reveal">
+      <h2 className="case-section-heading__title">{index}</h2>
+      <h3>{title}{body}</h3>
+    </div>
+  );
+}
+
+function FunnyFuzzyPagePreview({ src, alt, label, device = 'desktop', className = '', scrollable = true }) {
+  return (
+    <figure className={`ff-page-preview ff-page-preview--${device} ${className}`}>
+      {label && <figcaption>{label}</figcaption>}
+      <div className="ff-page-preview__shell">
+        <div className="ff-page-preview__bar" aria-hidden="true">
+          {device === 'desktop' ? (
+            <><span className="ff-page-preview__dots"><i /><i /><i /></span><span>funnyfuzzy.com</span><b>•••</b></>
+          ) : (
+            <><span>9:41</span><i /><span>● ◒</span></>
+          )}
+        </div>
+        <div
+          className={`ff-page-preview__viewport${scrollable ? '' : ' is-static'}`}
+          tabIndex={scrollable ? 0 : undefined}
+          aria-label={`${label || alt} ${scrollable ? '页面滚动预览' : '完整页面预览'}`}
+        >
+          <img src={src} alt={alt} loading="lazy" />
+        </div>
+      </div>
+    </figure>
+  );
+}
+
+const FF_DIRECTION_DATA = {
+  a: {
+    label: '方案 A',
+    title: 'F 型阅读路径',
+    strength: '符合多数用户的浏览习惯，能快速传递信息密集页面的关键标题、摘要与链接；核心内容沿起始与关键路径排列，便于聚焦，也相对容易适配不同尺寸。',
+    limit: '处于 F 型阅读动线以外区域的信息，很可能被用户忽略。',
+    desktop: '/assets/funnyfuzzy-homepage/direction-a-desktop.webp',
+    mobile: '/assets/funnyfuzzy-homepage/direction-a-mobile.webp',
+    anchors: [
+      { x: 58, y: 8, trigger: 0 },
+      { x: 84, y: 17, trigger: .09 },
+      { x: 78, y: 28, trigger: .24 },
+      { x: 82, y: 36, trigger: .32 },
+      { x: 58, y: 47, trigger: .42 },
+      { x: 82, y: 75, trigger: .68 }
+    ],
+    notes: [
+      ['F 型阅读动线', '尼尔森在 2006 年的网页眼动研究中观察到，用户通常先横向扫读页面上部，再向下移动并进行较短的第二次横向浏览，最终形成近似 F 形的视线路径。这一规律为高密度首页的信息层级与关键内容排布提供了依据。'],
+      ['品类入口', '取消圆形框架，以产品主体统一入口视觉，降低装饰对识别效率的干扰。'],
+      ['场景入口', '用错落构图和更大面积的图片替代常规商品卡片，让浏览节奏更生动。', '/assets/funnyfuzzy-homepage/direction-a-grid-state-1.jpg', '方案 A 场景网格拓展状态'],
+      ['宠物尺寸入口', '让宠物主体突破卡片边界，形成近似裸眼 3D 的空间感；通过悬停切换背景与宠物表情，为静态品类增加反馈，提升继续浏览与停留的意愿。', '/assets/funnyfuzzy-homepage/direction-a-pet-size-hover.jpg', '宠物尺寸入口的破框构图与悬停状态'],
+      ['空间探索', '以品牌色、空间标签和热点交互建立场景记忆，并让图片能够继续导向商品。', '/assets/funnyfuzzy-homepage/direction-a-space-exploration.png', '空间场景中的商品热点与展开卡片'],
+      ['品牌与信任', '强化内容之间的关联，将品牌行动、真实内容和媒体背书组织为连续收口。']
+    ]
+  },
+  b: {
+    label: '方案 B',
+    title: '错落场景网格',
+    strength: '错落的视觉节奏能快速吸引注意力，提高空间利用率、减少无效留白，并营造轻松、个性且有设计感的氛围，强化品牌记忆。',
+    limit: '阅读动线较为跳跃，用户视线容易在不同模块之间往返，不适合需要连续、深度阅读的文字型内容。',
+    desktop: '/assets/funnyfuzzy-homepage/direction-b-desktop.webp',
+    mobile: '/assets/funnyfuzzy-homepage/direction-b-mobile.webp',
+    anchors: [
+      { x: 84, y: 17 },
+      { x: 78, y: 31 },
+      { x: 70, y: 42 },
+      { x: 58, y: 53 },
+      { x: 82, y: 75 }
+    ],
+    notes: [
+      ['品类入口', '将图片与文字收进统一卡片，解决入口图片形态和文案长度不一致的问题。'],
+      ['商品承接', '保持清晰的商品序列，让高确定性购买内容仍然能够被快速比较。'],
+      ['场景网格', '使用错落式网格和品牌色块打破重复秩序，形成更强的视觉抓力。'],
+      ['空间探索', '以场景为组建立横向探索，配合热点与标签提示图片中的可购买内容。'],
+      ['品牌与信任', '把社会责任、用户内容、评价和媒体背书整合为更完整的品牌叙事。']
+    ]
+  }
+};
+
+function FunnyFuzzyDirectionChapter({ direction }) {
+  const [activeNote, setActiveNote] = useState(0);
+
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight } = event.currentTarget;
+    const progress = Math.min(1, Math.max(0, scrollTop / Math.max(scrollHeight, 1)));
+    const nextNote = direction.anchors.reduce((current, anchor, index) => (
+      progress >= (anchor.trigger ?? anchor.y / 100) ? index : current
+    ), 0);
+    setActiveNote(nextNote);
+  };
+
+  return (
+    <article className="ff-direction-chapter ff-home-reveal">
+      <header className="ff-direction-chapter__header">
+        <div className="ff-direction-chapter__intro">
+          <span>{direction.label}</span>
+          <h3>{direction.title}</h3>
+          <dl className="ff-direction-chapter__meta">
+            <div><dt>优势</dt><dd>{direction.strength}</dd></div>
+            <div><dt>限制</dt><dd>{direction.limit}</dd></div>
+          </dl>
+        </div>
+      </header>
+      <div className="ff-direction-chapter__stage">
+        <div className="ff-direction-chapter__pages" aria-label={`${direction.label}双端页面独立浏览`}>
+          <figure className="ff-direction-chapter__frame ff-direction-chapter__frame--mobile">
+            <figcaption>移动端</figcaption>
+            <div className="ff-direction-chapter__viewport" tabIndex="0" role="region" aria-label={`滚动查看${direction.label}移动端完整页面`}>
+              <img src={assetPath(direction.mobile)} alt={`${direction.label}移动端首页完整设计`} loading="lazy" />
+            </div>
+          </figure>
+          <figure className="ff-direction-chapter__frame ff-direction-chapter__frame--desktop">
+            <figcaption>桌面端</figcaption>
+            <div className="ff-direction-chapter__viewport" onScroll={handleScroll} tabIndex="0" role="region" aria-label={`滚动查看${direction.label}桌面端完整页面`}>
+              <div className="ff-direction-chapter__desktop-canvas">
+                <img src={assetPath(direction.desktop)} alt={`${direction.label}桌面端首页完整设计`} loading="lazy" />
+              </div>
+            </div>
+          </figure>
+        </div>
+        <div className="ff-direction-chapter__annotations" aria-live="polite">
+          {direction.notes.map(([title, body, image, imageAlt], index) => (
+            <article className={activeNote === index ? 'is-active' : ''} aria-hidden={activeNote !== index} key={title}>
+              <span>{title}</span>
+              <h4>{title}</h4>
+              <p>{body}</p>
+              {image && <img className="ff-direction-chapter__annotation-image" src={assetPath(image)} alt={imageAlt} loading="lazy" />}
+            </article>
+          ))}
+          <small>在页面内滚动查看设计思路</small>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function FunnyFuzzyDirectionExplorer() {
+  const [activeDirection, setActiveDirection] = useState('a');
+  const direction = FF_DIRECTION_DATA[activeDirection];
+
+  return (
+    <>
+      <div className="ff-directions__heading-row">
+        <FunnyFuzzySectionHeading
+          index="设计方向探索"
+          title="两种方向，寻找信息秩序与品牌活力的平衡。"
+          body="围绕首页的信息组织与视觉节奏，探索两种不同的内容承接方式。"
+        />
+        <div className="ff-directions__tabs" role="tablist" aria-label="设计方向方案">
+          {Object.entries(FF_DIRECTION_DATA).map(([key, item]) => (
+            <button
+              id={`ff-direction-tab-${key}`}
+              type="button"
+              role="tab"
+              aria-controls="ff-direction-panel"
+              aria-selected={activeDirection === key}
+              className={activeDirection === key ? 'is-active' : ''}
+              onClick={() => setActiveDirection(key)}
+              key={key}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div
+        id="ff-direction-panel"
+        className="ff-directions__explorer"
+        role="tabpanel"
+        aria-labelledby={`ff-direction-tab-${activeDirection}`}
+      >
+        <FunnyFuzzyDirectionChapter direction={direction} key={direction.label} />
+      </div>
+    </>
+  );
+}
+
+function FunnyFuzzyProblemVisual({ kind }) {
+  if (kind === 'hierarchy') {
+    return (
+      <div className="ff-problem-visual ff-problem-visual--hierarchy" aria-hidden="true">
+        <span /><span /><span /><span /><span /><span />
+      </div>
+    );
+  }
+
+  if (kind === 'momentum') {
+    return (
+      <div className="ff-problem-visual ff-problem-visual--momentum" aria-hidden="true">
+        <span /><span /><span /><span /><i />
+      </div>
+    );
+  }
+
+  if (kind === 'readability') {
+    return (
+      <div className="ff-problem-visual ff-problem-visual--readability" aria-hidden="true">
+        <div>
+          <strong>No more slippy sliding blanket</strong>
+          <span /><span /><span /><span /><span /><span /><span />
+          <b>View</b>
+        </div>
+        <i />
+      </div>
+    );
+  }
+
+  return (
+    <div className="ff-problem-visual ff-problem-visual--consistency" aria-hidden="true">
+      <span>Shop now</span>
+      <span>SHOP BEST SELLERS</span>
+      <span>SHOP TRIP ESSENTIALS</span>
+      <span>Read more reviews</span>
+    </div>
+  );
+}
+
+function FunnyFuzzyArchitecture({ stages }) {
+  const modules = stages.flatMap((stage) => stage.modules.map((module) => ({
+    label: module,
+    tone: stage.tone
+  })));
+
+  return (
+    <div className="ff-architecture">
+      <div className="ff-architecture__left">
+        <FunnyFuzzySectionHeading
+          index="首页信息架构"
+          title="让品牌认知、商品发现和信任建立在同一条路径中发生。"
+          body="首页从单纯的模块列表，转变为由第一印象到购买决策的逐层承接。"
+        />
+        <ol className="ff-architecture__stages">
+          {stages.map((stage) => (
+            <li key={stage.number} className={`ff-architecture__stage ff-architecture__stage--${stage.tone}`}>
+              <h3>{stage.title}</h3>
+              <p>{stage.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="ff-architecture__devices" aria-hidden="true">
+        <div className="ff-architecture__screen ff-architecture__screen--desktop">
+          <div className="ff-architecture__browser"><i /><i /><i /><span>funnyfuzzy.com</span></div>
+          <div className="ff-architecture__page">
+            {modules.map((module) => (
+              <div className={`ff-architecture__module ff-architecture__module--${module.tone}`} key={`${module.label}-desktop`}>
+                <strong>{module.label}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="ff-architecture__screen ff-architecture__screen--mobile">
+          <div className="ff-architecture__mobile-bar"><span>9:41</span><i /><b>● ◒</b></div>
+          <div className="ff-architecture__page">
+            {modules.map((module) => (
+              <div className={`ff-architecture__module ff-architecture__module--${module.tone}`} key={`${module.label}-mobile`}>
+                <strong>{module.label}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FunnyFuzzyCategoryComparison() {
+  const [version, setVersion] = useState('before');
+  const isBefore = version === 'before';
+  const versionLabel = isBefore ? 'Before' : 'After';
+
+  return (
+    <div className="ff-category-comparison ff-home-reveal">
+      <div className="ff-category-comparison__header">
+        <div className="ff-category-comparison__tabs" role="tablist" aria-label="类目页版本切换">
+          {['before', 'after'].map((item) => {
+            const label = item === 'before' ? 'Before' : 'After';
+            return (
+              <button
+                type="button"
+                role="tab"
+                id={`ff-category-${item}-tab`}
+                aria-controls="ff-category-comparison-panel"
+                aria-selected={version === item}
+                className={version === item ? 'is-active' : ''}
+                onClick={() => setVersion(item)}
+                key={item}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div
+        className="ff-home-final__composition ff-category-comparison__stage"
+        id="ff-category-comparison-panel"
+        role="tabpanel"
+        aria-labelledby={`ff-category-${version}-tab`}
+      >
+        <div className="ff-home-final__visuals" key={version}>
+          <FunnyFuzzyPagePreview
+            src={assetPath(`/assets/funnyfuzzy-homepage/category-${version}-desktop.jpg`)}
+            alt={`FunnyFuzzy 类目页${versionLabel}桌面端设计`}
+            className="ff-home-final__desktop ff-category-comparison__page"
+            scrollable={false}
+          />
+          <FunnyFuzzyPagePreview
+            src={assetPath(`/assets/funnyfuzzy-homepage/category-${version}-mobile.jpg`)}
+            alt={`FunnyFuzzy 类目页${versionLabel}移动端设计`}
+            device="mobile"
+            className="ff-home-final__mobile ff-category-comparison__page"
+            scrollable={false}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FunnyFuzzyHomepageDetail({ project }) {
+  const liveUrl = project.caseStudy.facts.find((fact) => fact.label === '状态')?.href;
+  const problems = [
+    ['hierarchy', '信息层级混杂', '商品、促销和品牌内容相互竞争，重点不够清晰。'],
+    ['momentum', '浏览动力不足', '模块高度同质，页面越往下越缺少继续探索的理由。'],
+    ['readability', '阅读操作费力', '移动端图标、文字与点击区域较小，扫读和选择成本较高。'],
+    ['consistency', '视觉系统不一', '卡片、按钮、栅格与控件样式不一，品牌识别被稀释。']
+  ];
+  const architectureStages = [
+    {
+      number: '01',
+      title: '建立印象',
+      body: '先用鲜明场景建立品牌感知，让用户迅速理解 FunnyFuzzy 的生活方式主张。',
+      modules: ['品牌首焦'],
+      tone: 'brand'
+    },
+    {
+      number: '02',
+      title: '引导选择',
+      body: '从高频需求进入商品，再用核心商品承接更明确的购买意图。',
+      modules: ['品类入口', '核心商品'],
+      tone: 'shop'
+    },
+    {
+      number: '03',
+      title: '延伸探索与信任',
+      body: '通过场景、真实内容和媒体背书，延长浏览并完成信任收口。',
+      modules: ['需求与空间', '真实内容', '媒体背书'],
+      tone: 'trust'
+    }
+  ];
+
+  return (
+    <article className="case-study ff-home-case">
+      <CaseHero project={project} />
+
+      <section className="case-visual-section ff-home-context" aria-label="首页改版任务">
+        <div className="ff-home-context__layout ff-home-reveal">
+          <div className="ff-home-context__copy">
+            <h3>重新定义<br />首页的任务。</h3>
+            <div>
+              <p>旧首页承载了大量商品、促销与品牌内容，却缺少清晰的浏览优先级。此次改版在不牺牲购物效率的前提下，重新组织品牌表达与浏览路径。我负责研究、页面框架、视觉设计与双端适配。</p>
+            </div>
+          </div>
+          <dl className="ff-home-context__metrics" aria-label="项目背景关键指标">
+            <div>
+              <dt>75%</dt>
+              <dd>用户主要浏览活动版位以上的内容</dd>
+            </div>
+            <div>
+              <dt>+15%</dt>
+              <dd>首页 ARPU 的业务目标</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-problems" aria-label="改版前体验问题">
+        <FunnyFuzzySectionHeading
+          index="改版前体验诊断"
+          title="内容并不少，但缺少帮助用户理解和选择的顺序。"
+          body="将分散的体验问题归纳为四类，用同一套标准同时检查桌面端与移动端。"
+        />
+        <div className="ff-home-problems__composition ff-home-reveal">
+          <div className="ff-home-problems__visuals">
+            <FunnyFuzzyPagePreview
+              src={assetPath('/assets/funnyfuzzy-homepage/before-desktop.webp')}
+              alt="FunnyFuzzy 改版前桌面端首页"
+              className="ff-home-problems__desktop"
+            />
+            <FunnyFuzzyPagePreview
+              src={assetPath('/assets/funnyfuzzy-homepage/before-mobile.webp')}
+              alt="FunnyFuzzy 改版前移动端首页"
+              device="mobile"
+              className="ff-home-problems__mobile"
+            />
+          </div>
+          <div className="ff-home-problems__summary" aria-label="改版前体验问题总结">
+            {problems.map(([, title, body]) => (
+              <article key={title}>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-framework" aria-label="首页信息架构">
+        <FunnyFuzzyArchitecture stages={architectureStages} />
+      </section>
+
+      <section className="case-visual-section ff-home-moodboard" aria-label="视觉情绪版">
+        <FunnyFuzzySectionHeading
+          index="视觉情绪版"
+          title="把品牌情绪转译为可执行的界面语言。"
+          body="情绪版不只约束选图，也同步定义首页的内容主次、浏览节奏与组件形态，让视觉方向能够真正落到页面设计中。"
+        />
+        <div className="ff-home-moodboard__grid ff-home-reveal">
+          <article>
+            <div className="ff-home-moodboard__image">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/mood-vitality.webp')} alt="快乐奔跑的金毛犬与温暖居家场景" loading="lazy" />
+              <div className="ff-home-moodboard__copy"><span>Scene</span><h3>场景建立第一印象</h3></div>
+            </div>
+            <p>用真实陪伴场景承载首焦与内容模块，保留主体和呼吸空间，避免商品、促销与文案同时争夺注意力。</p>
+          </article>
+          <article>
+            <div className="ff-home-moodboard__image">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/mood-immersion.webp')} alt="沙发、边几、矮凳与床形成前后层次的家居陈列" loading="lazy" />
+              <div className="ff-home-moodboard__copy"><span>Hierarchy</span><h3>层级引导浏览节奏</h3></div>
+            </div>
+            <p>借鉴家居陈列中主次分明的空间关系，通过图片、标题、入口与留白的尺度差异建立阅读顺序，让用户先理解主题，再进入选择与购买。</p>
+          </article>
+          <article>
+            <div className="ff-home-moodboard__image">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/mood-softness.webp')} alt="沙发扶手、木质桌角与宠物床包边呈现克制的小圆角细节" loading="lazy" />
+              <div className="ff-home-moodboard__copy"><span>Interface</span><h3>小圆角贴近生活物件</h3></div>
+            </div>
+            <p>从沙发、桌凳与床等生活物品的边缘提取克制的小圆角，用于卡片、按钮和图片容器，让界面保持利落，也更贴合产品语境。</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-directions" aria-label="设计方向探索">
+        <FunnyFuzzyDirectionExplorer />
+      </section>
+
+      <section className="case-visual-section ff-home-decisions" aria-label="核心设计策略">
+        <div className="ff-home-decisions__layout ff-home-reveal">
+          <div className="ff-home-decisions__copy">
+            <FunnyFuzzySectionHeading
+              index="核心设计策略"
+              title="最终方案不是二选一，而是让不同类型的内容使用合适的秩序。"
+              body="商品和文字沿用清晰的线性结构，场景与品牌内容则使用更自由的网格和色彩节奏。"
+            />
+            <div className="ff-home-decisions__list">
+              <article>
+                <h3>放大信息与操作尺度</h3><p>减少细小图标和高密度卡片，让标题、图片与行动入口更容易被扫读和点击。</p>
+              </article>
+              <article>
+                <h3>用场景组织商品发现</h3><p>将需求、空间和真实使用画面引入首页，让用户从“看到商品”转向“想象使用”。</p>
+              </article>
+              <article>
+                <h3>让品牌色成为节奏工具</h3><p>橙色承担品牌与信任内容，高亮绿和粉色用于场景导航，其余区域保持克制。</p>
+              </article>
+              <article>
+                <h3>保持双端路径一致</h3><p>桌面端与移动端共享同一内容逻辑，再依据视口重新安排图片比例、模块顺序与浏览方式。</p>
+              </article>
+            </div>
+          </div>
+          <div className="ff-home-decisions__visuals" aria-label="核心设计策略视觉意象">
+            <figure className="ff-home-decisions__visual ff-home-decisions__visual--scale">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/strategy-scale.png')} alt="用尺度对比表现清晰操作的橙色透镜装置" loading="lazy" />
+              <figcaption><span>Scale</span><strong>放大关键操作</strong></figcaption>
+            </figure>
+            <figure className="ff-home-decisions__visual ff-home-decisions__visual--scene">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/strategy-context.png')} alt="由沙发与家居形态组成的抽象生活场景" loading="lazy" />
+              <figcaption><span>Context</span><strong>场景承接发现</strong></figcaption>
+            </figure>
+            <figure className="ff-home-decisions__visual ff-home-decisions__visual--rhythm">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/strategy-rhythm.png')} alt="橙色、绿色与粉色构成的错落视觉节奏" loading="lazy" />
+              <figcaption><span>Rhythm</span><strong>颜色建立节奏</strong></figcaption>
+            </figure>
+            <figure className="ff-home-decisions__visual ff-home-decisions__visual--responsive">
+              <img src={assetPath('/assets/funnyfuzzy-homepage/strategy-responsive.png')} alt="宽窄两种框架由同一路径连接的响应式意象" loading="lazy" />
+              <figcaption><span>Responsive</span><strong>双端路径一致</strong></figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-final" aria-label="最终双端设计">
+        <FunnyFuzzySectionHeading
+          index="最终双端设计"
+          title="同一条购物路径，在桌面端与移动端重新组织节奏。"
+          body="桌面端利用横向空间建立快速比较；移动端重新设计图片比例、内容顺序和横向浏览，而不是等比缩放 Web 版。"
+        />
+        <div className="ff-home-final__composition ff-home-reveal">
+          <div className="ff-home-final__notes">
+            <span>响应式策略</span>
+            <h3>同一路径，<br />不同节奏。</h3>
+            <p>桌面端强化横向比较与内容并置，移动端则重新安排图片比例、模块顺序和横向浏览，让重点在更窄的视口中仍然清晰。</p>
+            {liveUrl && <a className="ff-home-final__live" href={liveUrl} target="_blank" rel="noreferrer">查看已上线商城 <ArrowRight aria-hidden="true" /></a>}
+          </div>
+          <div className="ff-home-final__visuals">
+            <FunnyFuzzyPagePreview
+              src={assetPath('/assets/funnyfuzzy-homepage/final-desktop.webp')}
+              alt="FunnyFuzzy 商城首页最终桌面端设计"
+              className="ff-home-final__desktop"
+            />
+            <FunnyFuzzyPagePreview
+              src={assetPath('/assets/funnyfuzzy-homepage/final-mobile.webp')}
+              alt="FunnyFuzzy 商城首页最终移动端设计"
+              device="mobile"
+              className="ff-home-final__mobile"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-results" aria-label="首页线上数据">
+        <FunnyFuzzySectionHeading
+          index="首页线上数据结果"
+          title="新的内容结构呈现出更积极的商品探索与加购趋势。"
+          body="最终改版方案作为 Variant，与现网旧版 Original 进行 A/B 测试。以下为全设备数据。"
+        />
+        <div className="ff-home-results__panel ff-home-reveal">
+          <div className="ff-home-results__primary">
+            {[
+              ['商品点击率', '36.07%', '38.46%', '6.6%', '↑'],
+              ['跳出率', '63.93%', '61.54%', '3.7%', '↓'],
+              ['加购率', '4.92%', '8.65%', '76.0%', '↑']
+            ].map(([label, before, after, change, direction], index) => (
+              <article className={index === 0 ? 'is-featured' : ''} key={label}>
+                <strong><span>{change}</span><b aria-hidden="true">{direction}</b></strong>
+                <h3>{label}</h3>
+                <p><small>Original&nbsp; {before}</small><i aria-hidden="true">→</i><small>Variant&nbsp; {after}</small></p>
+              </article>
+            ))}
+          </div>
+          <div className="ff-home-results__devices">
+            <article><span>移动端加购率</span><strong>6.28% → 9.41%</strong><small>相对提升 49.8%</small></article>
+            <article><span>桌面端加购率</span><strong>2.04% → 7.27%</strong><small>相对提升 256.4%，样本较小</small></article>
+          </div>
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-extension" aria-label="后续系列页范围">
+        <FunnyFuzzySectionHeading
+          index="系列页延展结果"
+          title="首页之后，同一套逻辑继续延展到系列页。"
+          body="系列页已落地，重点改善分类、筛选、商品展示、场景连带与 FAQ。该部分作为项目的后续范围，不展开为第二个主案例。"
+        />
+        <div className="ff-home-problems__composition ff-home-extension__composition ff-home-reveal">
+          <div className="ff-home-extension__grid ff-home-extension__metrics">
+            <div><span>转化率</span><strong>6.03% → 6.62%</strong><small>全设备相对提升 9.9%</small></div>
+            <div><span>每访客收入</span><strong>$7.04 → $7.99</strong><small>整体提升 13.4%，接近 15% 目标</small></div>
+            <div><span>设备差异</span><strong>Mobile +38.5%</strong><small>每访客收入；Desktop 同期为 -11.1%</small></div>
+          </div>
+          <FunnyFuzzyCategoryComparison />
+        </div>
+      </section>
+
+      <section className="case-visual-section ff-home-summary" aria-label="项目总结">
+        <p>PROJECT SUMMARY</p>
+        <h2>这次改版最重要的变化，不是让首页看起来更新，而是让每一类内容都有明确任务。</h2>
+        <div><p>品牌场景负责吸引和记忆，品类与商品负责分流和决策，真实内容与媒体背书负责建立信任。</p><p>移动端结果更积极，而系列页的桌面端数据也提醒团队：响应式设计不只是布局适配，还需要持续验证不同设备上的内容效率。</p></div>
+      </section>
+    </article>
   );
 }
 
@@ -731,6 +2087,19 @@ function AmazonScrollablePage({ src, alt, label, device = 'desktop', className =
 
 function AmazonStoreDetail({ project }) {
   const liveUrl = project.caseStudy.facts.find((fact) => fact.label === '状态')?.href;
+  const benchmarkScrollerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const scroller = benchmarkScrollerRef.current;
+    if (!scroller) return undefined;
+
+    scroller.scrollLeft = 0;
+    const resetFrame = window.requestAnimationFrame(() => {
+      scroller.scrollLeft = 0;
+    });
+
+    return () => window.cancelAnimationFrame(resetFrame);
+  }, [project.id]);
 
   return (
     <article className="case-study amazon-case">
@@ -767,7 +2136,7 @@ function AmazonStoreDetail({ project }) {
           title="成熟案例"
           body="只选取真实的 Amazon Brand Store 作为样本，比较它们如何在平台框架内组织首屏主张、品类分流、商品承接与品牌表达，避免把独立站的视觉规则直接套用到 Amazon 页面。"
         />
-        <div className="amazon-benchmark__grid">
+        <div className="amazon-benchmark__grid" ref={benchmarkScrollerRef}>
           {AMAZON_RESEARCH.map((item) => (
             <a href={item.href} target="_blank" rel="noreferrer" key={item.title}>
               <div className="amazon-benchmark__image"><img src={item.image} alt={`${item.title} 参考案例`} /></div>
@@ -777,9 +2146,12 @@ function AmazonStoreDetail({ project }) {
             </a>
           ))}
         </div>
+        <AmazonSectionHeading
+          className="amazon-benchmark__patterns-title"
+          title="研究结论"
+        />
         <div className="amazon-benchmark__patterns">
           <div className="amazon-benchmark__patterns-heading">
-            <span>研究结论</span>
             <p>成熟店铺不是堆叠更多素材，而是让品牌认知与购物路径在同一套顺序里发生。</p>
           </div>
           <div className="amazon-benchmark__patterns-list">
@@ -793,20 +2165,40 @@ function AmazonStoreDetail({ project }) {
         </div>
       </section>
 
-      <section className="case-sticky-showcase amazon-before" aria-label="改版前首页问题">
-        <div className="case-sticky-copy amazon-before__copy">
-          <h2>现网问题</h2>
-          <h3>现网有足够多的视觉素材，但缺少帮助用户理解和选择的顺序。</h3>
-          <ul>
-            <li>WAP 直接缩放 Web 端物料，文字和商品细节难以识别</li>
-            <li>插画、实景图、活动色和品牌色同时竞争注意力</li>
-            <li>热销、品类、品牌故事和活动内容没有稳定的层级</li>
-            <li>内容量很大，但首屏与中段都缺少清晰的购买路径</li>
-          </ul>
-        </div>
-        <div className="amazon-before__visuals">
-          <AmazonScrollablePage src={assetPath('/assets/amazon-store-home/before-desktop.jpg')} alt="FUNNYFUZZY Amazon 改版前桌面端首页" label="BEFORE / WEB" />
-          <AmazonScrollablePage src={assetPath('/assets/amazon-store-home/before-mobile.jpg')} alt="FUNNYFUZZY Amazon 改版前移动端首页" label="BEFORE / H5" device="mobile" />
+      <section className="case-visual-section amazon-before" aria-label="改版前首页问题">
+        <AmazonSectionHeading
+          title="现网问题"
+          body="现网有足够多的视觉素材，但缺少帮助用户理解品牌、识别层级并完成选择的内容顺序。"
+        />
+        <div className="amazon-final-showcase__composition amazon-before__composition">
+          <div className="amazon-before__copy">
+            <span>四个核心问题</span>
+            <ul>
+              {[
+                ['双端失真', 'WAP 直接缩放 Web 端物料，文字和商品细节难以识别。'],
+                ['视觉争夺', '插画、实景图、活动色和品牌色同时竞争注意力。'],
+                ['层级混乱', '热销、品类、品牌故事和活动内容没有稳定层级。'],
+                ['路径模糊', '内容量很大，但首屏与中段都缺少清晰的购买路径。']
+              ].map(([title, body]) => (
+                <li key={title}><h3>{title}</h3><p>{body}</p></li>
+              ))}
+            </ul>
+          </div>
+          <div className="amazon-final-showcase__visuals amazon-before__visuals">
+            <AmazonScrollablePage
+              src={assetPath('/assets/amazon-store-home/before-desktop.jpg')}
+              alt="FUNNYFUZZY Amazon 改版前桌面端首页"
+              label="改版前 Web 端页面滚动预览"
+              className="amazon-final__browser amazon-final-showcase__desktop"
+            />
+            <AmazonScrollablePage
+              src={assetPath('/assets/amazon-store-home/before-mobile.jpg')}
+              alt="FUNNYFUZZY Amazon 改版前移动端首页"
+              label="改版前移动端页面滚动预览"
+              device="mobile"
+              className="amazon-final__browser amazon-final-showcase__mobile"
+            />
+          </div>
         </div>
       </section>
 
@@ -914,34 +2306,34 @@ function AmazonStoreDetail({ project }) {
         </div>
       </section>
 
-      <section className="case-visual-section amazon-final-web" aria-label="最终 Web 端设计">
+      <section className="case-visual-section amazon-final-showcase" aria-label="最终双端设计">
         <AmazonSectionHeading
           title="设计展示"
-          body="利用桌面端的横向空间建立清晰分区，让主题场景、热销商品、品牌信息与核心类目支持快速比较和连续浏览。"
+          body="围绕同一套内容目标，为桌面端与移动端分别组织浏览节奏，让主题场景、热销商品、品牌信息与核心类目在不同屏幕中都保持清晰。"
         />
-        <AmazonScrollablePage
-          src={assetPath('/assets/amazon-store-home/final-desktop-hq.jpg')}
-          alt="FUNNYFUZZY Amazon 店铺首页最终 Web 端完整方案"
-          label="最终 Web 端页面滚动预览"
-          className="amazon-final__browser amazon-final-web__browser"
-        />
-      </section>
-
-      <section className="case-visual-section amazon-final-mobile" aria-label="最终移动端设计">
-        <div className="amazon-final-mobile__copy">
-          <AmazonSectionHeading
-            title="移动端设计"
-            body="围绕移动端扫读重新组织图片比例、文字尺寸与内容顺序，让同一套内容在窄屏中保持清晰节奏，而不是对 Web 版等比缩放。"
-          />
-          {liveUrl && <a className="amazon-final__live" href={liveUrl} target="_blank" rel="noreferrer">查看已上线 Amazon 店铺 <ArrowRight aria-hidden="true" /></a>}
+        <div className="amazon-final-showcase__composition">
+          <div className="amazon-final-showcase__notes">
+            <span>响应式策略</span>
+            <h3>同一套内容，<br />两种浏览节奏。</h3>
+            <p>桌面端利用横向空间支持快速比较与连续浏览；移动端重新组织图片比例、文字尺寸与内容顺序，适应窄屏中的扫读与触控。</p>
+            {liveUrl && <a className="amazon-final__live" href={liveUrl} target="_blank" rel="noreferrer">查看已上线 Amazon 店铺 <ArrowRight aria-hidden="true" /></a>}
+          </div>
+          <div className="amazon-final-showcase__visuals">
+            <AmazonScrollablePage
+              src={assetPath('/assets/amazon-store-home/final-desktop-hq.jpg')}
+              alt="FUNNYFUZZY Amazon 店铺首页最终 Web 端完整方案"
+              label="最终 Web 端页面滚动预览"
+              className="amazon-final__browser amazon-final-showcase__desktop"
+            />
+            <AmazonScrollablePage
+              src={assetPath('/assets/amazon-store-home/final-mobile.jpg')}
+              alt="FUNNYFUZZY Amazon 店铺首页最终移动端完整方案"
+              label="最终移动端页面滚动预览"
+              device="mobile"
+              className="amazon-final__browser amazon-final-showcase__mobile"
+            />
+          </div>
         </div>
-        <AmazonScrollablePage
-          src={assetPath('/assets/amazon-store-home/final-mobile.jpg')}
-          alt="FUNNYFUZZY Amazon 店铺首页最终移动端完整方案"
-          label="最终移动端页面滚动预览"
-          device="mobile"
-          className="amazon-final__browser amazon-final-mobile__browser"
-        />
       </section>
 
       <section className="case-visual-section amazon-results" aria-label="项目数据结果">

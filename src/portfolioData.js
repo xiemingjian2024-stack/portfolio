@@ -26,6 +26,13 @@ export const navItems = [
   { label: '联系', path: '/contact' }
 ];
 
+export const caseFactTokens = [
+  { key: 'brand', label: '品牌' },
+  { key: 'status', label: '状态' },
+  { key: 'role', label: '角色' },
+  { key: 'scope', label: '范围' }
+];
+
 const rawPortfolioSections = {
   app: {
     title: '移动产品与体验',
@@ -34,8 +41,8 @@ const rawPortfolioSections = {
       {
         id: 'app-funnfuzzy-icon-guide',
         title: 'FunnFuzzy APP icon design guide',
-        year: '2026',
-        type: 'APP 图标系统',
+        year: '2025',
+        type: '图标系统',
         summary: '为 FunnFuzzy APP 梳理图标视觉规范：统一线性风格、品牌识别和移动端场景中的使用方式。',
         color: '#FFAC33',
         coverVariant: 'app-icon-guide',
@@ -873,10 +880,10 @@ const rawPortfolioSections = {
         id: 'app-vmall-smart-service-2',
         title: '华为商城智能客服',
         year: '2022',
-        type: 'APP客服系统',
+        type: '客服系统',
         summary:
           '基于小艺智能客服能力，拓展 VMALL 售前后问询场景，统一交互体验与视觉表达。',
-        color: '#06346F',
+        color: '#090827',
         coverVariant: 'vmall-smart-service',
         coverLogo: '/assets/vmall-smart-service-2/logo.svg',
         coverLogoAlt: 'VMALL 智能客服',
@@ -893,7 +900,7 @@ const rawPortfolioSections = {
         id: 'app-vplus-membership',
         title: 'V+ 会员',
         year: '2023',
-        type: 'APP会员体系',
+        type: '会员体系',
         summary:
           '围绕开通、权益认知与商城消费，整合专享优惠、积分回馈和会员服务，打造清晰一致的 V+ 会员体验。',
         color: '#F1F3F5',
@@ -934,10 +941,36 @@ const rawPortfolioSections = {
     kicker: '网页',
     projects: [
       {
+        id: 'web-funnyfuzzy-homepage',
+        title: 'FunnyFuzzy商城首页设计',
+        year: '2026',
+        type: '网页设计',
+        summary: '围绕品牌表达、商品探索与双端体验，完成 FunnyFuzzy 商城首页的系统性改版。',
+        color: '#F3F3F0',
+        coverImage: '/assets/funnyfuzzy-homepage/cover.png',
+        coverImageAlt: '绿色沙发上的电脑展示 FunnyFuzzy 商城首页首屏',
+        caseStudy: {
+          template: 'funnyfuzzy-homepage',
+          intro:
+            '从真实的浏览与点击问题出发，把 FunnyFuzzy 首页从商品与活动的堆叠，重构为一条兼顾品牌感、商品发现与购买决策的场景化购物路径。',
+          facts: [
+            { label: '品牌', value: 'FunnyFuzzy' },
+            {
+              label: '状态',
+              value: '已上线',
+              linkLabel: 'funnyfuzzy.com',
+              href: 'https://funnyfuzzy.com/'
+            },
+            { label: '角色', value: '设计与策略' },
+            { label: '范围', value: '研究、框架、设计' }
+          ]
+        }
+      },
+      {
         id: 'web-uom',
         title: 'UOM',
-        year: '2024–2025',
-        type: '网页 / 后台设计系统',
+        year: '2024',
+        type: '后台系统',
         summary:
           '从 100+ 个真实运营体验问题出发，统一公共组件、页面规范与研发能力，让分散建设的商城后台逐步形成可复用、可持续上线的产品体系。',
         color: '#EEF3FB',
@@ -1226,7 +1259,7 @@ const rawPortfolioSections = {
         id: 'web-amazon-store-home',
         title: 'Amazon店铺首页设计',
         year: '2026',
-        type: '网页 / 电商首页',
+        type: '网页改版',
         summary:
           '从市场、竞品与现网体验出发，重新组织 FUNNYFUZZY Amazon 店铺的品牌表达、品类路径与双端购物节奏。',
         color: '#F3F3F0',
@@ -1251,9 +1284,9 @@ const rawPortfolioSections = {
       },
       {
         id: 'web-bujiaban-smart-material-tool',
-        title: '布家班-智能物料设计工具',
-        year: '2026',
-        type: '网页 / 智能设计工具',
+        title: '布家班',
+        year: '2022',
+        type: '工具设计',
         summary:
           '预置 50+ 种常用站外物料尺寸与 30+ 套设计模板，设计师上传 Logo、背景、产品图与文案后，即可智能批量生成素材，并串联运营审核与下载交付流程。',
         color: '#573eff',
@@ -1269,40 +1302,40 @@ const rawPortfolioSections = {
       },
       {
         id: 'web-huawei-cloud-product-pages',
-        title: 'HUAWEI CLOUD 产品页设计',
-        year: '2026',
-        type: '网页 / 产品页',
+        title: '华为云产品页设计',
+        year: '2019',
+        type: '页面设计',
         summary: '围绕华为云官网产品页、解决方案页与多语言页面，整理企业级信息排版与页面视觉一致性。',
         color: '#FFAC33',
         coverVariant: 'huawei-cloud',
         coverImage: '/assets/huawei-cloud/product-pages-cover.jpg',
-        coverImageAlt: 'HUAWEI CLOUD 产品页设计封面',
+        coverImageAlt: '华为云产品页设计封面',
         caseStudy: {
           template: 'statement-gallery',
           eyebrow: 'WEB / Product Pages',
           image: '/assets/huawei-cloud/product-pages-collage.jpg',
-          imageAlt: 'HUAWEI CLOUD 产品页设计合集',
+          imageAlt: '华为云产品页设计合集',
           statement:
             '为 HUAWEI CLOUD 官网产品页、解决方案页与多语言产品页面建立清晰的页面视觉。在高密度信息、企业级品牌规范和多业务场景之间，保持层级、节奏与一致识别。'
         }
       },
       {
         id: 'web-huawei-cloud-campaign-pages',
-        title: 'HUAWEI CLOUD 活动页设计',
-        year: '2026',
-        type: '网页 / 活动页',
+        title: '华为云活动页设计',
+        year: '2019',
+        type: '页面设计',
         summary: '围绕华为云大促、专题活动和品牌发布场景，整理活动页视觉、节奏和转化模块的页面表达。',
         color: '#FFAC33',
         coverVariant: 'huawei-cloud',
         coverImage: '/assets/huawei-cloud/campaign-pages-cover.jpg',
-        coverImageAlt: 'HUAWEI CLOUD 活动页设计封面',
+        coverImageAlt: '华为云活动页设计封面',
         coverLogo: '/assets/huawei-cloud/campaign-cover-logo.svg',
-        coverLogoAlt: 'HUAWEI CLOUD 活动页设计封面标志',
+        coverLogoAlt: '华为云活动页设计封面标志',
         caseStudy: {
           template: 'statement-gallery',
           eyebrow: 'WEB / Campaign Pages',
           image: '/assets/huawei-cloud/campaign-pages-collage.jpg',
-          imageAlt: 'HUAWEI CLOUD 活动页设计合集',
+          imageAlt: '华为云活动页设计合集',
           statement:
             '为 HUAWEI CLOUD 活动页建立更具节奏感的视觉入口。在大促、发布会和专题活动之间，组织首屏氛围、产品权益和转化模块，让高密度活动信息保持清晰、有力和统一。'
         }
@@ -1314,6 +1347,163 @@ const rawPortfolioSections = {
     kicker: 'AI',
     projects: [
       {
+        id: 'ai-edm-editor',
+        title: 'EDM Editor',
+        year: '2026',
+        type: 'AI 辅助工作流',
+        summary: '把重复设计沉淀为受规则约束的 EDM 工作流，让运营自主编辑文字、价格与颜色，设计师专注于规范和建议。',
+        color: '#101010',
+        coverVariant: 'edm-editor',
+        caseStudy: {
+          template: 'edm-editor',
+          intro: '把已有 EDM 模板转化为受设计规范约束的运营工具：减少设计师重复工作，把文字、价格与颜色的调整交给运营，同时保留必要的品牌边界。',
+          facts: [
+            { key: 'brand', value: '个人项目' },
+            { key: 'status', value: '已开源' },
+            { key: 'role', value: '产品、设计、开发' },
+            { key: 'scope', value: '构思、交互、视觉、落地' }
+          ],
+          statement: '颜色同样开放给运营编辑，但系统提供品牌建议与安全范围。设计师负责提出方向，不再逐项替运营做决定，减少来回修改，也避免双方因主观审美产生冲撞。',
+          background: {
+            title: '让设计师管规则，让运营管变化',
+            body: '这个工具并不是让运营自由做设计，而是重新分配双方的工作：设计师把版式、层级与品牌判断固化为规则，运营在规则内完成高频内容调整，减少等待、核对与审美拉扯。',
+            pains: [
+              ['减少设计工作量', '把相同版式下的替图、改字、调价格等重复劳动从设计排期中移出，让设计师专注新模板与关键视觉判断。'],
+              ['约束运营制图规范', '版式、字号、间距、图片比例与导出边界由模板锁定；运营拥有组合能力，但不能突破品牌和可用性底线。'],
+              ['内容由运营直接负责', '文字与价格交给最了解活动信息的运营自行编辑，避免设计师代录后再经历逐字、逐价核对和反复修改。']
+            ]
+          },
+          decisions: [
+            ['01 / LESS REPETITION', '把重复制作变成模板组合', 'Logo、导航、Banner、标题、卖点、商品卡与页尾以楼层复用，设计师不再为同一版式重复排期和切图。'],
+            ['02 / RULED FREEDOM', '运营能做图，但不能破坏规范', '布局、字号、间距、图片比例和导出边界由模板约束；运营只在安全范围内组合内容。'],
+            ['03 / CONTENT OWNERSHIP', '文字和价格由运营直接编辑', '运营可以修改文案、按钮与价格，也可从 Shopify 链接同步商品信息，省去设计师代录与双方反复核对。'],
+            ['04 / COLOR COLLABORATION', '颜色交给运营，设计提供建议', '运营按活动需要调整背景与强调色；系统保留推荐色与品牌范围，让设计建议可被参考，而不是变成审美冲撞。']
+          ],
+          capabilities: [
+            ['模板系统', '以注册表、字段 schema 和导出区域描述模板，新模板可以沿用同一编辑器与导出链路。'],
+            ['EDM + GIF', '支持静态 EDM 楼层与 4 类 GIF 模板；GIF 作品可被 Banner 引用、同步和继续编辑。'],
+            ['真实商品同步', '从 Shopify 链接读取商品标题、主图、图库与价格，保留运营对按钮文案和局部内容的控制。'],
+            ['本地优先', '草稿与素材保存在本机，可打包为 macOS、Windows 桌面应用，降低内部数据外传与部署门槛。'],
+            ['稳定导出', '处理图片裁切、拖动、缩放、半像素接缝、GIF 帧顺序与可点击热区，让预览和导出保持一致。'],
+            ['可验证实现', '以 250 项自动测试覆盖编辑器、模板、商品同步、导出与服务层，并通过真实浏览器回归关键流程。']
+          ],
+          results: [
+            ['−58%', '重复设计需求量', '试运行估算 · 待实际数据校准'],
+            ['20 min', '标准 EDM 组合耗时', '原流程约 2–3 个工作日'],
+            ['−45%', '交付往返次数', '文字、价格自助编辑与字段约束带来的估算'],
+            ['250', '自动化测试', '覆盖编辑、模板、导出与服务层']
+          ]
+        }
+      },
+      {
+        id: 'ai-material-collector',
+        title: '谢小屯 — AI 素材采集器',
+        year: '2026',
+        type: 'AI 本地工作流',
+        summary: '把网页中的图片、GIF 与视频一键收进本地素材库，并让标签随着人工纠正持续贴近个人习惯。',
+        color: '#F3F3F0',
+        coverVariant: 'material-collector',
+        caseStudy: {
+          template: 'material-collector',
+          eyebrow: 'AI / Personal Tool',
+          intro: '一个由浏览器采集扩展与 macOS 本地素材库组成的个人工具，让灵感从网页进入可浏览、可检索、会学习的本地工作流。',
+          facts: [
+            { key: 'brand', value: '个人项目' },
+            { key: 'status', value: '本地工作流 / Chrome + macOS' },
+            { key: 'role', value: '产品、设计、开发' },
+            { key: 'scope', value: '构思、交互、视觉、落地' }
+          ],
+          background: {
+            title: '设计背景',
+            body: '花瓣承接了日常灵感收藏，却没有完全接上本地工作流；素材仍需手动下载、归档和补充标签，跨平台限制与重复整理不断打断设计过程。',
+            pains: [
+              ['跨平台采集受限', '不同网站的素材保存方式并不统一，部分页面还会限制直接采集。'],
+              ['本地归档需要维护', '每次都要建立、命名并切换文件夹，浏览与整理被反复打断。'],
+              ['分类与标签成本高', '素材保存后仍要手动判断归类、输入标签，数量越多，维护时间越高。']
+            ]
+          },
+          principle: '把“采集—理解—纠正—再利用”收进本地，让素材不只被保存，也能在持续使用中理解我的判断，逐步长成贴近个人工作方式的素材系统。',
+          flow: [
+            ['01', '网页采集', '悬停素材出现圆形仓鼠按钮，不离开当前页面完成采集。', 'human'],
+            ['02', '保存原文件', '扩展将图片、GIF 或视频写入本地素材目录，并保留来源。', 'system'],
+            ['03', '素材理解', '本地模型生成内容与用途标签，同时记录格式、比例和颜色。', 'model'],
+            ['04', '检索与复用', '我从素材库中选择真正有用的参考，让素材重新进入当前设计任务。', 'human', '我选择参与'],
+            ['05', '偏好学习', '本地模型把我的选择、增删与否定记录整理为下一次判断的偏好上下文。', 'model']
+          ],
+          classification: {
+            model: 'Qwen3-VL 2B · 4-bit',
+            runtime: 'MLX 本地推理 / 图片缩放至 1600 × 2400 内 / 不上传云端',
+            inputs: [
+              ['01 / FILE', '文件基础信息', '文件名与宽高比先生成可确定的格式、版式和来源线索。'],
+              ['02 / VISION', 'OCR 与布局预判', 'macOS Vision 识别文字、矩形结构、物体与人脸，为 UI 判断提供提示。'],
+              ['03 / PREFERENCE', '个人偏好上下文', '人工新增标签进入常用词表；被删除标签被记录为需要更强证据的纠正项。']
+            ],
+            assetTypes: ['UI页面', 'UI组件', '平面设计', '摄影', '插画', '3D', 'GIF动效', '视频', '其他'],
+            branches: [
+              ['UI BRANCH', '界面标签分支', 'UI 置信度 ≥ 0.80', ['页面类型 ≤ 1', '组件 ≤ 5', '行业 ≤ 2', '视觉属性 ≤ 3']],
+              ['GENERAL BRANCH', '通用素材分支', '未通过 UI 门槛', ['人物 / 产品', '摄影 / 插画', '包装 / 品牌', '动物 / 场景 ≤ 8']]
+            ],
+            merge: [
+              ['规则标签', '文件名、尺寸与 Vision 产生的确定性标签。'],
+              ['模型标签', '通过词表、数量与置信度门槛的语义标签。'],
+              ['人工新增', '保留用户主动补充的用途和项目语言。'],
+              ['人工删除', '从最终结果中排除，并进入后续纠正上下文。']
+            ]
+          },
+          benchmark: {
+            checkedAt: '公开能力核对 / 2026.08',
+            title: '工具对比',
+            body: '花瓣更像成熟的云端灵感平台，谢小屯更像贴身的本地工作台。花瓣把采集、画板、标签与同步组织成完整的灵感管理体系；谢小屯没有复刻这套平台能力，而是把采集动作做得更轻，再让本地模型接手整理。',
+            rows: [
+              {
+                dimension: '采集方式',
+                huaban: '采集体系更完整，素材需要先进入画板；若要形成可检索的秩序，还要继续手动维护标签、色板等维度，管理能力更强，但时间成本也更高。',
+                materialCollector: '只保留悬停采集按钮，原文件与来源先进入本地；分类、用途标签和属性识别由本地模型异步完成，更纯粹，也不会中断浏览。',
+                huabanBadge: '更完整',
+                materialCollectorBadge: '更纯粹'
+              },
+              {
+                dimension: '素材归属',
+                huaban: '默认进入账号与云端画板；本地同步、离线浏览位于 Pro 客户端体系。',
+                materialCollector: '原文件直接进入用户指定文件夹，Finder 与其他软件可以继续使用。',
+                winner: 'materialCollector'
+              },
+              {
+                dimension: '整理与规模',
+                huaban: '画板、标签、色板、搜索与千万级图片管理，适合大型灵感库。',
+                materialCollector: '只保留个人高频的搜索、类型与用途标签，界面更轻、更少维护。',
+                winner: 'huaban'
+              },
+              {
+                dimension: '个性化判断',
+                huaban: '公开能力更侧重通用分类、搜索与跨设备管理。',
+                materialCollector: '记录新增与否定标签，让后续判断持续贴近个人工作语言。',
+                winner: 'materialCollector'
+              },
+              {
+                dimension: '协作与同步',
+                huaban: '云端同步、多设备访问与分享链路更成熟，现阶段更适合跨设备管理。',
+                materialCollector: '当前仍是单人本地工具；后续可从共享素材包、用户自选同步源和团队标签词典开始扩展，而不改变本地优先原则。',
+                huabanBadge: '当前更成熟',
+                materialCollectorBadge: '可扩展路线'
+              }
+            ],
+            extensions: [
+              ['01 / 可迁移', '共享素材包', '将选中的原文件、来源、标签与项目结构一起导出和导入，先解决低成本交接。'],
+              ['02 / 跨设备', '用户自选同步源', '支持 iCloud、NAS 或 WebDAV 等用户已有存储，只同步文件与元数据，不绑定新的内容云。'],
+              ['03 / 团队化', '共享标签词典', '团队共享项目术语、用途标签和命名规则；个人新增与否定偏好仍保留在自己的设备上。'],
+              ['04 / 功能扩展', '临时项目组', '围绕当前项目临时归集所需素材与参考，集中查看与调用；项目结束后可解散项目组，素材仍保留在个人素材库中。']
+            ],
+            advantages: [
+              ['原始大图直接进入素材库', '列表页即可解析卡片对应的大图，不必进入详情页或从平台二次下载。'],
+              ['标签会学习个人偏好', '用户的补充与否定不是一次性编辑，而是下一次判断的依据。'],
+              ['只展示真正有用的信息', '用途与具体模块优先；格式、颜色、比例退到后台，减少标签噪音。'],
+              ['围绕自己的工作流定制', '高频网站保留专项解析，同时兼容普通网页和本地 Finder 流程。']
+            ]
+          }
+        }
+      },
+      {
         id: 'ai-product-assets-locator',
         title: '产品素材快速定位工具',
         year: '2026',
@@ -1324,14 +1514,15 @@ const rawPortfolioSections = {
         caseStudy: {
           eyebrow: 'AI / Internal Tool',
           facts: [
-            { label: '类型', value: '自主需求/协作工具' },
-            { label: '人数', value: '1人' },
-            { label: '用户', value: '产品、运营、设计、摄影' },
+            { key: 'brand', value: '个人项目' },
             {
-              label: 'GitHub',
-              value: 'github.com/xiemingjian2024-stack/...',
+              key: 'status',
+              value: '已开源',
+              linkLabel: 'github.com/xiemingjian2024-stack/...',
               href: 'https://github.com/xiemingjian2024-stack/funnyfuzzy-product-assets-extension'
-            }
+            },
+            { key: 'role', value: '1人 / 产品、设计、开发' },
+            { key: 'scope', value: '产品、运营、设计、摄影' }
           ],
           intro:
             '为运营、设计、摄影团队设计的内部插件，帮助同事从产品页快速找到 SPU 与 NAS 素材。',
@@ -1378,6 +1569,25 @@ const rawPortfolioSections = {
     ]
   }
 };
+
+function sortPortfolioSectionsByYear(sections) {
+  const getNewestYear = (year) => {
+    const years = String(year).match(/\d{4}/g)?.map(Number) ?? [];
+    return years.length ? Math.max(...years) : 0;
+  };
+
+  return Object.fromEntries(
+    Object.entries(sections).map(([sectionKey, section]) => [
+      sectionKey,
+      {
+        ...section,
+        projects: [...section.projects].sort((firstProject, secondProject) => (
+          getNewestYear(secondProject.year) - getNewestYear(firstProject.year)
+        ))
+      }
+    ])
+  );
+}
 
 const rawPhotographyItems = [
   {
@@ -2201,11 +2411,13 @@ const rawPhotographyItems = [
   }
 ];
 
-export const portfolioSections = withAssetBase(rawPortfolioSections);
+export const portfolioSections = withAssetBase(sortPortfolioSectionsByYear(rawPortfolioSections));
 export const photographyItems = withAssetBase(rawPhotographyItems);
 
 export function findProjectById(projectId) {
-  return Object.values(portfolioSections)
-    .flatMap((section) => section.projects.map((project) => ({ ...project, section: section.kicker })))
+  return Object.entries(portfolioSections)
+    .flatMap(([sectionKey, section]) => (
+      section.projects.map((project) => ({ ...project, section: section.kicker, sectionKey }))
+    ))
     .find((project) => project.id === projectId);
 }

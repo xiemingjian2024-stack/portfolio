@@ -2,7 +2,12 @@
 node_modules/
 dist/
 .playwright-cli/
-.qa-*.png
+qa-*
+.qa-*
+design-qa-*
+design-qa/
+.codex-qa/
+.portfolio-local-server*.log
 tmp/
 output/
 outputs/
