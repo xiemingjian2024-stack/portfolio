@@ -883,10 +883,10 @@ const rawPortfolioSections = {
         type: '客服系统',
         summary:
           '基于小艺智能客服能力，拓展 VMALL 售前后问询场景，统一交互体验与视觉表达。',
-        color: '#090827',
+        color: '#B9DDFF',
         coverVariant: 'vmall-smart-service',
-        coverLogo: '/assets/vmall-smart-service-2/logo.svg',
-        coverLogoAlt: 'VMALL 智能客服',
+        coverImage: '/assets/vmall-smart-service-2/cover-handheld-clean-v5.png',
+        coverImageAlt: '华为商城智能客服手持手机封面',
         caseStudy: {
           template: 'statement-gallery',
           eyebrow: 'APP / Intelligent Customer Service',

@@ -252,16 +252,7 @@ function BujiabanCover() {
 }
 
 function VmallSmartServiceCover({ project }) {
-  return (
-    <div className="vmall-smart-service-cover">
-      <VmallServiceWaveCanvas />
-      <img
-        className="vmall-smart-service-cover__logo"
-        src={project.coverLogo}
-        alt={project.coverLogoAlt}
-      />
-    </div>
-  );
+  return <img className="vmall-smart-service-cover" src={project.coverImage} alt={project.coverImageAlt} />;
 }
 
 function VmallServiceWaveCanvas() {
@@ -1408,12 +1399,17 @@ function UomCover({ project, detail = false }) {
       role="img"
     >
       <img
-        className="uom-cover__visual"
-        src={assetPath('/assets/uom/uom-cover-visual.jpg')}
+        className="uom-cover__logo"
+        src={assetPath('/assets/uom/uom-vmall-portal.svg')}
         alt=""
         aria-hidden="true"
       />
-      <img className="uom-cover__logo" src={assetPath('/assets/uom/uom-vmall-portal.svg')} alt="" aria-hidden="true" />
+      <img
+        className="uom-cover__orb"
+        src={assetPath('/assets/uom/uom-guideline-orb.png')}
+        alt=""
+        aria-hidden="true"
+      />
     </div>
   );
 }
@@ -2860,18 +2856,91 @@ function IdealVmallDetail({ project }) {
       <OrderCurrentAnalysis />
       <OrderPageShowcase />
 
-      <section className="case-visual-section ideal-vmall-ending" aria-label="项目总结">
-        <header className="ideal-vmall-ending__header">
-          <p>项目结语</p>
-          <div aria-label="设计策略关键词">
-            <span>纯净</span>
-            <span>贴心</span>
-            <span>高品质</span>
+      <section className="case-visual-section ideal-vmall-ending" aria-label="项目总结与页面总览">
+        <div className="ideal-vmall-ending__copy">
+          <header className="ideal-vmall-ending__header">
+            <p>项目结语</p>
+            <div aria-label="设计策略关键词">
+              <span>纯净</span>
+              <span>贴心</span>
+              <span>高品质</span>
+            </div>
+          </header>
+          <div className="ideal-vmall-ending__statement">
+            <p>高端，不是把所有信息藏起来，极致地留白、降噪，</p>
+            <h2>而是在每一次决定发生前，只为用户呈现刚刚好的内容。</h2>
           </div>
-        </header>
-        <div className="ideal-vmall-ending__statement">
-          <p>高端，不是把所有信息藏起来，极致地留白、降噪，</p>
-          <h2>而是在每一次决定发生前，只为用户呈现刚刚好的内容。</h2>
+        </div>
+
+        <div className="ideal-vmall-ending__overview">
+          <button
+            className="ideal-vmall-ending__arrow ideal-vmall-ending__arrow--previous"
+            type="button"
+            aria-label="向左浏览页面总览"
+            onClick={(event) => {
+              const viewport = event.currentTarget.parentElement?.querySelector('.ideal-vmall-final-overview__viewport');
+              viewport?.scrollBy({ left: -viewport.clientWidth * 0.72, behavior: 'smooth' });
+            }}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <div
+            className="ideal-vmall-final-overview__viewport"
+            role="region"
+            aria-label="横向滚动查看华为商城改版完整页面"
+            tabIndex="0"
+            onPointerDown={(event) => {
+              const viewport = event.currentTarget;
+              viewport.setPointerCapture(event.pointerId);
+              viewport.dataset.dragStartX = String(event.clientX);
+              viewport.dataset.dragStartScroll = String(viewport.scrollLeft);
+              viewport.classList.add('is-dragging');
+            }}
+            onPointerMove={(event) => {
+              const viewport = event.currentTarget;
+              if (!viewport.hasPointerCapture(event.pointerId)) return;
+              const startX = Number(viewport.dataset.dragStartX || event.clientX);
+              const startScroll = Number(viewport.dataset.dragStartScroll || viewport.scrollLeft);
+              viewport.scrollLeft = startScroll - (event.clientX - startX);
+            }}
+            onPointerUp={(event) => {
+              const viewport = event.currentTarget;
+              viewport.releasePointerCapture(event.pointerId);
+              viewport.classList.remove('is-dragging');
+              delete viewport.dataset.dragStartX;
+              delete viewport.dataset.dragStartScroll;
+            }}
+            onWheel={(event) => {
+              const viewport = event.currentTarget;
+              const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+              const movement = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+              const canMove = movement > 0 ? viewport.scrollLeft < maxScroll : viewport.scrollLeft > 0;
+
+              if (canMove) {
+                event.preventDefault();
+                viewport.scrollLeft += movement;
+              }
+            }}
+          >
+            <img
+              src={assetPath('/assets/ideal-vmall/final-page-overview.jpg')}
+              alt="华为商城改版完整页面横向总览"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            />
+          </div>
+          <button
+            className="ideal-vmall-ending__arrow ideal-vmall-ending__arrow--next"
+            type="button"
+            aria-label="向右浏览页面总览"
+            onClick={(event) => {
+              const viewport = event.currentTarget.parentElement?.querySelector('.ideal-vmall-final-overview__viewport');
+              viewport?.scrollBy({ left: viewport.clientWidth * 0.72, behavior: 'smooth' });
+            }}
+          >
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
       </section>
     </article>

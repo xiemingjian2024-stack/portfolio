@@ -595,14 +595,16 @@ describe('portfolio routes', () => {
     expect(uomMeta.getByText('2024')).toBeInTheDocument();
     expect(uomMeta.getByText('后台系统')).toBeInTheDocument();
     const uomCover = document.querySelector('.project-cover--uom .uom-cover');
-    expect(uomCover.querySelector('.uom-cover__visual')).toHaveAttribute(
+    expect(uomCover.querySelector('.uom-cover__orb')).toHaveAttribute(
       'src',
-      '/assets/uom/uom-cover-visual.jpg'
+      '/assets/uom/uom-guideline-orb.png'
     );
     expect(uomCover.querySelector('.uom-cover__logo')).toHaveAttribute(
       'src',
       '/assets/uom/uom-vmall-portal.svg'
     );
+    expect(uomCover.querySelector('.uom-cover__title')).not.toBeInTheDocument();
+    expect(uomCover.querySelector('.uom-cover__visual')).not.toBeInTheDocument();
     expect(uomCover.querySelector('.uom-cover__scene')).not.toBeInTheDocument();
     expect(uomCover.querySelector('.uom-cover__principle')).not.toBeInTheDocument();
 
@@ -782,8 +784,8 @@ describe('portfolio routes', () => {
     expect(css).toContain('--funnyfuzzy-orange: #ffac33;');
     expect(css).not.toContain('--brand-orange');
     expect(css).toContain('--uom-accent: #6993ff;');
-    expect(css).toMatch(/\.uom-cover\s*\{[^}]*background:\s*#6993ff;/s);
-    expect(css).toMatch(/\.uom-cover__logo\s*\{[^}]*filter:\s*brightness\(0\) invert\(1\);/s);
+    expect(css).toMatch(/\.uom-cover\s*\{[^}]*background:\s*#f2f3f5;/s);
+    expect(css).toMatch(/\.uom-cover__orb\s*\{[^}]*bottom:\s*-45%;/s);
     expect(css).toMatch(/\.uom-issue-explorer\s*{[^}]*background:\s*var\(--uom-surface\);/s);
     expect(css).toContain('--uom-cover-blue-rgb: 105, 147, 255;');
     expect(css).toContain('--uom-cover-green-rgb: 82, 196, 26;');
@@ -827,7 +829,7 @@ describe('portfolio routes', () => {
     expect(docs).not.toContain('全局品牌橙');
   });
 
-  it('presents the VMALL smart service project with its animated service cover and statement gallery', () => {
+  it('presents the VMALL smart service project with its supplied desk-and-phone cover and statement gallery', () => {
     const { unmount } = renderAt('/app');
 
     expect(screen.getByRole('link', { name: '华为商城智能客服' })).toHaveAttribute(
@@ -835,14 +837,13 @@ describe('portfolio routes', () => {
       '/project/app-vmall-smart-service-2'
     );
     expect(screen.getByText('客服系统')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'VMALL 智能客服' })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: '华为商城智能客服手持手机封面' })).toHaveAttribute(
       'src',
-      '/assets/vmall-smart-service-2/logo.svg'
+      '/assets/vmall-smart-service-2/cover-handheld-clean-v5.png'
     );
-    expect(document.querySelector('.vmall-smart-service-cover__canvas')).toBeInTheDocument();
-    expect(document.querySelector('.vmall-smart-service-cover__wave')).not.toBeInTheDocument();
+    expect(document.querySelector('.vmall-smart-service-cover')).toBeInTheDocument();
     expect(document.querySelector('.project-cover--vmall-smart-service')).toHaveStyle({
-      '--cover-color': '#090827'
+      '--cover-color': '#B9DDFF'
     });
 
     unmount();
@@ -1060,8 +1061,12 @@ describe('portfolio routes', () => {
     expect(screen.getByRole('img', { name: '现网订单物流跟踪页' })).toHaveAttribute('src', '/assets/ideal-vmall/order-current/order-tracking.jpg');
     expect(screen.getByRole('heading', { name: '订单页面呈现' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: '订单中心、订单详情与物流状态页面组合展示' })).toHaveAttribute('src', '/assets/ideal-vmall/order-showcase/order-pages-composite.jpg');
+    expect(screen.getByRole('region', { name: '横向滚动查看华为商城改版完整页面' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '向左浏览页面总览' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '向右浏览页面总览' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: '华为商城改版完整页面横向总览' })).toHaveAttribute('src', '/assets/ideal-vmall/final-page-overview.jpg');
     expect(document.querySelector('.ideal-vmall-gallery__item')).not.toBeInTheDocument();
-    expect(document.querySelectorAll('.ideal-vmall-case img')).toHaveLength(77);
+    expect(document.querySelectorAll('.ideal-vmall-case img')).toHaveLength(78);
   });
 
   it('keeps the remaining HUAWEI CLOUD gallery pages as separate statement-gallery projects', () => {
